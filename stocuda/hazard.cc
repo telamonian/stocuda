@@ -23,6 +23,7 @@
 using namespace boost::numeric::ublas;
 
 typedef matrix<double> state_type;
+typedef double (*rl_pointer)(double, int *, int *);
 typedef matrix<int>::iterator1 i1_t;
 typedef matrix<int>::iterator2 i2_t;
 
@@ -31,23 +32,13 @@ double rl_10(double c, int * M1, int * M2);
 double rl_11(double c, int * M1, int * M2);
 double rl_20(double c, int * M1, int * M2);
 
-void Hazard::Update(state_type M) {
+void Hazard::Update(matrix<int> M) {
 	static const matrix<double> summer (scalar_matrix<double> (1, H.size1(), 1));
-	for (int i = 0; i<Hfunc.size1(); ++i) {
+	for (int i = 0; i<HFunc.size1(); ++i) {
 		//std::cout << i << "\t" << H << "\t"  << Hfunc.size1() << "\t" << Hfunc.size2() << std::endl;
-		H(i,0) = Hfunc(i,0)(M);
+		H(i,0) = HFunc(i,0)(c(i,0), MPtrs(i,0), MPtrs(i,1));
 	}
 	H0 = std::abs(prod(summer, H)(0,0));
-}
-void Hazard::operator() ( const state_type &x , state_type &dxdt , const double /* t */ ) {
-	double temp;
-	for (int i = 0; i<x.size1(); ++i){
-		temp = 0;
-		for (int j = 0; j<S.size2(); ++j) {
-			temp += S(i,j)*Hfunc(j,0)(x);
-		}
-		dxdt(i,0) = temp;
-	}
 }
 
 matrix<int> Hazard::InitOrder() {
@@ -80,7 +71,7 @@ matrix<int> Hazard::InitOrder() {
 	return order;
 }
 
-matrix<int*> Hazard::InitMPtrs() {
+matrix<int*> Hazard::InitMPtrs(matrix<int> &M) {
 	matrix<int*> mptrs(c.size1(), 2);
 	int max1;
 	int max2;
@@ -114,7 +105,7 @@ matrix<int*> Hazard::InitMPtrs() {
 	return mptrs;
 }
 
-matrix<rl_pointer> Hazard::InitHfunc() {
+matrix<rl_pointer> Hazard::InitHFunc() {
 	matrix<rl_pointer> hfunc(c.size1(), 1);
 	int max1;
 	int max2;
@@ -149,38 +140,6 @@ matrix<rl_pointer> Hazard::InitHfunc() {
 	}
 	return hfunc;
 }
-
-//matrix<boost::function<double(matrix<double>)> > Hazard::InitHfunc() {
-//	matrix<boost::function<double(state_type)> > hfunc(c.size1(), 1);
-//	double c_coeff;
-//	double rl = 1;
-//	for (matrix<int>::const_iterator1 it1 = Pre.begin1(); it1!=Pre.end1(); ++it1) {
-//		c_coeff = boost::accumulate(it1.begin(), it1.end(), 1.0, [] (double c, int s) {
-//			if (s > 1) {
-//				for (int x: boost::irange(2, s+1)) {
-//					c *= x;
-//				}
-//			}
-//			return c;
-//		});
-//		hfunc(it1.index1(), 0) = [=, this, &rl] (state_type M) {
-//			double c = (this->c)(it1.index1(), 0)*(1.0/c_coeff);
-//			rl = 1;
-//			for (matrix<int>::const_iterator2 it2 = it1.begin(); it2!=it1.end(); ++it2) {
-//				if (*it2 > 0) {
-//					boost::integer_range<int> ir = boost::irange(0, *it2);
-//					rl *= boost::fusion::accumulate(ir.begin(), ir.end(), 1,[=, &M] (double rrl, int r) {
-//						return rrl*(M(it2.index2(), 0) - r);
-//					});
-//				}
-//			}
-//			return c*rl;
-//		};
-//	}
-//	return hfunc;
-//}
-
-
 
 double rl_00(double c, int * M1, int * M2) {
 	return c;

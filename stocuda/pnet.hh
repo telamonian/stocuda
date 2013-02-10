@@ -58,7 +58,7 @@ public:
 		uni(0, 1) {}
 
 	/// initialized from premade matrices
-	Pnet(matrix<std::string> Pi, matrix<std::string> Ti, matrix<int> Prei, matrix<int> Posti, state_type Mi, state_type ci):
+	Pnet(matrix<std::string> Pi, matrix<std::string> Ti, matrix<int> Prei, matrix<int> Posti, matrix<int> Mi, state_type ci):
 		P(Pi),
 		T(Ti),
 		Pre(Prei),
@@ -87,7 +87,7 @@ public:
 	matrix<int> Post;
 
 	/// u x 1 column vector of current system marking
-	state_type M;
+	matrix<int> M;
 
 	/// v x 1 column vector of stochastic rate constants
 	state_type c;
@@ -137,10 +137,6 @@ public:
 	/// Gillespie specific methods
 	/// move the network n steps forward according to the Gillespie algorithm, record results by overwriting M
 	void Gillespie(int n=1);
-
-	std::vector< state_type > x_vec;
-	std::vector<double> times;
-	void Deterministic();
 };
 
 #endif /* PNET_HH_ */
