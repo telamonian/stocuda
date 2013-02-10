@@ -8,6 +8,7 @@
 #ifndef PNET_HH_
 #define PNET_HH_
 
+#include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -18,8 +19,8 @@
 #include <string>
 #include "hazard.hh"
 
+using namespace pyublas;
 using namespace boost::numeric::ublas;
-typedef matrix<double> state_type;
 
 class Pnet {
 
@@ -27,8 +28,8 @@ public:
 	/// constructors
 	/// default
 	Pnet():
-		P(),
-		T(),
+		//P(),
+		//T(),
 		Pre(),
 		Post(),
 		M(),
@@ -43,8 +44,8 @@ public:
 
 	/// empty, correctly dimension instance
 	Pnet(int u, int v):
-		P(u, 1),
-		T(v, 1),
+		//P(u, 1),
+		//T(v, 1),
 		Pre(v, u),
 		Post(v, u),
 		M(u,1),
@@ -58,16 +59,32 @@ public:
 		uni(0, 1) {}
 
 	/// initialized from premade matrices
-	Pnet(matrix<std::string> Pi, matrix<std::string> Ti, matrix<int> Prei, matrix<int> Posti, matrix<int> Mi, state_type ci):
-		P(Pi),
-		T(Ti),
+// 	Pnet(numpy_matrix<std::string> Pi, numpy_matrix<std::string> Ti, numpy_matrix<int> Prei, numpy_matrix<int> Posti, numpy_matrix<int> Mi, matrix<double> ci):
+// 		P(Pi),
+// 		T(Ti),
+// 		Pre(Prei),
+// 		Post(Posti),
+// 		M(Mi),
+// 		c(ci),
+// 		H(Hazard(Pre, Post, M, c)),
+// 		t(0),
+// 		A(InitA()),
+// 		S(InitS()),
+// 		mtgen(time(NULL)),
+// 		dt(H.H0),
+// 		uni(0, 1) {}
+		
+    /// 'stubby' initializer to test pyublas
+    Pnet(numpy_matrix<int> Prei, numpy_matrix<int> Posti, numpy_matrix<int> Mi, numpy_matrix<double> ci):
+		//P(),
+		//T(),
 		Pre(Prei),
 		Post(Posti),
 		M(Mi),
 		c(ci),
-		H(Hazard(Pre, Post, M, c)),
 		t(0),
 		A(InitA()),
+		H(Hazard(Pre, Post, M, c)),
 		S(InitS()),
 		mtgen(time(NULL)),
 		dt(H.H0),
@@ -75,11 +92,11 @@ public:
 
 	/// variables
 	/// u x 1 column vector of species names
-	matrix<std::string> P;
+	//numpy_matrix<std::string> P;
 
 	/// v x 1 column vector of reaction names
-	matrix<std::string> T;
-
+	//numpy_matrix<std::string> T;
+	
 	/// v x u pre matrix
 	matrix<int> Pre;
 
@@ -90,7 +107,7 @@ public:
 	matrix<int> M;
 
 	/// v x 1 column vector of stochastic rate constants
-	state_type c;
+	matrix<double> c;
 
 	/// simulation time
 	double t;
@@ -115,7 +132,7 @@ public:
 
 	/// methods
 	/// utility methods
-//	double EWSum(state_type m);
+//	double EWSum(matrix<double> m);
 
 	/// initalization methods
 	/// initialize reaction matrix

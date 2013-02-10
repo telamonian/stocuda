@@ -31,6 +31,9 @@ void Pnet::Gillespie(int n) {
 			tsum += H.H(j,0);
 		}
 		UpdateM(j);
+		//for (int k = 0; k < M.size1(); ++k)
+		    //std::cout << &(M.data()[0]) + k << '\t' << *(&(M.data()[0]) + k) << '\t' ;
+		//std::cout << std::endl;
 		std::cout << t << '\t' << M << std::endl;
 
 		/// prep random number generators for next round

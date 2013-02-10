@@ -5,6 +5,7 @@
  *      Author: tel
  */
 
+#include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/range/irange.hpp>
@@ -15,14 +16,9 @@
 #include <boost/fusion/algorithm/iteration/accumulate.hpp>
 #include "hazard.hh"
 
-#include <boost/range.hpp>
-#include <boost/range/adaptors.hpp>
-#include <boost/range/algorithm.hpp>
-#include <boost/range/numeric.hpp>
-
+using namespace pyublas;
 using namespace boost::numeric::ublas;
 
-typedef matrix<double> state_type;
 typedef double (*rl_pointer)(double, int *, int *);
 typedef matrix<int>::iterator1 i1_t;
 typedef matrix<int>::iterator2 i2_t;
@@ -33,12 +29,16 @@ double rl_11(double c, int * M1, int * M2);
 double rl_20(double c, int * M1, int * M2);
 
 void Hazard::Update(matrix<int> M) {
-	static const matrix<double> summer (scalar_matrix<double> (1, H.size1(), 1));
+	static const scalar_matrix<double> summer (scalar_matrix<double> (1, H.size1(), 1));
+	
 	for (int i = 0; i<HFunc.size1(); ++i) {
-		//std::cout << i << "\t" << H << "\t"  << Hfunc.size1() << "\t" << Hfunc.size2() << std::endl;
+	    //std::cout << MPtrs(i, 0) << '\t';
+		//std::cout << i << "\t" << H << std::endl;
 		H(i,0) = HFunc(i,0)(c(i,0), MPtrs(i,0), MPtrs(i,1));
 	}
-	H0 = std::abs(prod(summer, H)(0,0));
+	//std::cout << std::endl;
+	H0 = prod(summer, H)(0,0);
+	
 }
 
 matrix<int> Hazard::InitOrder() {
@@ -59,9 +59,10 @@ matrix<int> Hazard::InitOrder() {
 				max1 = *it2;
 				max1i = it2.index2();
 			}
-			else if (*it2 > max2)
+			else if (*it2 > max2) {
 				max2 = *it2;
 				max2i = it2.index2();
+			}
 		}
 		order(it1.index1(), 0) = max1;
 		order(it1.index1(), 1) = max2;
@@ -89,18 +90,22 @@ matrix<int*> Hazard::InitMPtrs(matrix<int> &M) {
 				max1 = *it2;
 				max1i = it2.index2();
 			}
-			else if (*it2 > max2)
+			else if (*it2 > max2) {
+			    //std::cout << " max2 assigned " << max2 << ' ' << *it2 << ' ' << it2.index2() << ' ';
 				max2 = *it2;
 				max2i = it2.index2();
+			}
 		}
+		//std::cout << '\t' << max1 << '\t' << max2 << '\t' << max1i << '\t' << max2i << '\t';
 		if (max1 > 0)
-			mptrs(it1.index1(), 0) = &M(max1i,0);
+			mptrs(it1.index1(), 0) = &(M.data()[0]) + max1i;
 		else
 			mptrs(it1.index1(), 0) = NULL;
 		if (max2 > 0)
-			mptrs(it1.index1(), 1) = &M(max2i,0);
+			mptrs(it1.index1(), 1) = &(M.data()[0]) + max2i;
 		else
 			mptrs(it1.index1(), 1) = NULL;
+	    //std::cout << "M address in initmptrs: " << &(M.data()[0]) << std::endl;
 	}
 	return mptrs;
 }
@@ -123,9 +128,10 @@ matrix<rl_pointer> Hazard::InitHFunc() {
 				max1 = *it2;
 				max1i = it2.index2();
 			}
-			else if (*it2 > max2)
+			else if (*it2 > max2) {
 				max2 = *it2;
 				max2i = it2.index2();
+			}
 		}
 		if (max1==0 && max2==0)
 			hfunc(it1.index1(), 0) = rl_00;
@@ -142,17 +148,21 @@ matrix<rl_pointer> Hazard::InitHFunc() {
 }
 
 double rl_00(double c, int * M1, int * M2) {
+    //std::cout << "rl_00" << std::endl;
 	return c;
 }
 
 double rl_10(double c, int * M1, int * M2) {
+	//std::cout << "rl_10" << '\t' << M1 << std::endl;
 	return c*(*M1);
 }
 
 double rl_11(double c, int * M1, int * M2) {
+    //std::cout << "rl_11" << '\t' << M1 << '\t' << M2 << std::endl;
 	return c*(*M1)*(*M2);
 }
 
 double rl_20(double c, int * M1, int * M2) {
+    //std::cout << "rl_20" << '\t' << M1 << std::endl;
 	return (c/2)*(*M1)*(*M1-1);
 }

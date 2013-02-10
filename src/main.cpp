@@ -30,6 +30,6 @@ int main () {
 	Pnet N(P, T, Pre, Post, M, c);
 	std::cout << "time" << '\t' << "marking" << std::endl;
 	std::cout << N.t << '\t' << N.M << std::endl;
-	N.Gillespie(1000);
+	N.Gillespie(10000);
 	return 0;
 }

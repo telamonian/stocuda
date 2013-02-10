@@ -1,0 +1,1 @@
+/Users/tel/git/stocuda/build/src/CMakeFiles/stocuda.dir
