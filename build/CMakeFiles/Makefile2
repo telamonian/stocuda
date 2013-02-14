@@ -59,10 +59,12 @@ CMAKE_BINARY_DIR = /Users/tel/git/stocuda/build
 # Directory level rules for directory src
 
 # Convenience name for "all" pass in the directory.
+src/all: src/CMakeFiles/hazard.dir/all
 src/all: src/CMakeFiles/stocuda.dir/all
 .PHONY : src/all
 
 # Convenience name for "clean" pass in the directory.
+src/clean: src/CMakeFiles/hazard.dir/clean
 src/clean: src/CMakeFiles/stocuda.dir/clean
 .PHONY : src/clean
 
@@ -71,13 +73,48 @@ src/preinstall:
 .PHONY : src/preinstall
 
 #=============================================================================
+# Target rules for target src/CMakeFiles/hazard.dir
+
+# All Build rule for target.
+src/CMakeFiles/hazard.dir/all:
+	$(MAKE) -f src/CMakeFiles/hazard.dir/build.make src/CMakeFiles/hazard.dir/depend
+	$(MAKE) -f src/CMakeFiles/hazard.dir/build.make src/CMakeFiles/hazard.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /Users/tel/git/stocuda/build/CMakeFiles  1
+	@echo "Built target hazard"
+.PHONY : src/CMakeFiles/hazard.dir/all
+
+# Include target in all.
+all: src/CMakeFiles/hazard.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/CMakeFiles/hazard.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/tel/git/stocuda/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/hazard.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/tel/git/stocuda/build/CMakeFiles 0
+.PHONY : src/CMakeFiles/hazard.dir/rule
+
+# Convenience name for target.
+hazard: src/CMakeFiles/hazard.dir/rule
+.PHONY : hazard
+
+# clean rule for target.
+src/CMakeFiles/hazard.dir/clean:
+	$(MAKE) -f src/CMakeFiles/hazard.dir/build.make src/CMakeFiles/hazard.dir/clean
+.PHONY : src/CMakeFiles/hazard.dir/clean
+
+# clean rule for target.
+clean: src/CMakeFiles/hazard.dir/clean
+.PHONY : clean
+
+#=============================================================================
 # Target rules for target src/CMakeFiles/stocuda.dir
 
 # All Build rule for target.
-src/CMakeFiles/stocuda.dir/all:
+src/CMakeFiles/stocuda.dir/all: src/CMakeFiles/hazard.dir/all
 	$(MAKE) -f src/CMakeFiles/stocuda.dir/build.make src/CMakeFiles/stocuda.dir/depend
 	$(MAKE) -f src/CMakeFiles/stocuda.dir/build.make src/CMakeFiles/stocuda.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /Users/tel/git/stocuda/build/CMakeFiles  1 2 3
+	$(CMAKE_COMMAND) -E cmake_progress_report /Users/tel/git/stocuda/build/CMakeFiles  2 3 4
 	@echo "Built target stocuda"
 .PHONY : src/CMakeFiles/stocuda.dir/all
 
@@ -87,7 +124,7 @@ all: src/CMakeFiles/stocuda.dir/all
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/stocuda.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/tel/git/stocuda/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/tel/git/stocuda/build/CMakeFiles 4
 	$(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/stocuda.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/tel/git/stocuda/build/CMakeFiles 0
 .PHONY : src/CMakeFiles/stocuda.dir/rule

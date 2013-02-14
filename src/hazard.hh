@@ -20,7 +20,7 @@ using namespace boost::numeric::ublas;
 class Hazard {
 
 public:
-	typedef double (*rl_pointer)(double, int *, int *);
+	typedef double (*rl_pointer)(double, int , int );
 
 	/// constructors
 	/// default
@@ -65,10 +65,12 @@ public:
 	double H0;
 	matrix<int> Order;
 	matrix<int> InitOrder();
-	matrix<int*> MPtrs;
-	matrix<int*> InitMPtrs(matrix<int> &M);
+	matrix<int> MPtrs;
+	matrix<int> InitMPtrs(matrix<int> &M);
 	matrix<rl_pointer> HFunc;
 	matrix<rl_pointer> InitHFunc();
+
+	//void Update();
 	void Update(matrix<int> M);
 
 	matrix<double> InitS() {

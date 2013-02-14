@@ -102,6 +102,20 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+src/CMakeFiles/hazard.dir/rule:
+	cd /Users/tel/git/stocuda/build && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/hazard.dir/rule
+.PHONY : src/CMakeFiles/hazard.dir/rule
+
+# Convenience name for target.
+hazard: src/CMakeFiles/hazard.dir/rule
+.PHONY : hazard
+
+# fast build rule for target.
+hazard/fast:
+	cd /Users/tel/git/stocuda/build && $(MAKE) -f src/CMakeFiles/hazard.dir/build.make src/CMakeFiles/hazard.dir/build
+.PHONY : hazard/fast
+
+# Convenience name for target.
 src/CMakeFiles/stocuda.dir/rule:
 	cd /Users/tel/git/stocuda/build && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/stocuda.dir/rule
 .PHONY : src/CMakeFiles/stocuda.dir/rule
@@ -194,6 +208,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... hazard"
 	@echo "... rebuild_cache"
 	@echo "... stocuda"
 	@echo "... hazard.o"

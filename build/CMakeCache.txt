@@ -37,13 +37,13 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None(CMAKE_CXX_FLAGS or
 // CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.
-CMAKE_BUILD_TYPE:STRING=
+CMAKE_BUILD_TYPE:STRING=debug
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
 //CXX compiler.
-CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++
+CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++
 
 //Flags used by the compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=
@@ -63,7 +63,7 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //C compiler.
-CMAKE_C_COMPILER:FILEPATH=/usr/bin/cc
+CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc
 
 //Flags used by the compiler during all build types.
 CMAKE_C_FLAGS:STRING=
@@ -148,7 +148,7 @@ CMAKE_OSX_DEPLOYMENT_TARGET:STRING=
 CMAKE_OSX_SYSROOT:STRING=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=hello
+CMAKE_PROJECT_NAME:STATIC=stocuda
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -201,10 +201,10 @@ CUDA_BUILD_CUBIN:BOOL=OFF
 CUDA_BUILD_EMULATION:BOOL=OFF
 
 //"cudart" library
-CUDA_CUDART_LIBRARY:FILEPATH=/usr/local/cuda/lib/libcudart.dylib
+CUDA_CUDART_LIBRARY:FILEPATH=/Developer/NVIDIA/CUDA-5.0/lib/libcudart.dylib
 
 //"cuda" library (older versions only).
-CUDA_CUDA_LIBRARY:FILEPATH=/usr/local/cuda/lib/libcuda.dylib
+CUDA_CUDA_LIBRARY:FILEPATH=/Library/Frameworks/cuda.framework
 
 //Directory to put all the output files.  If blank it will default
 // to the CMAKE_CURRENT_BINARY_DIR
@@ -214,10 +214,10 @@ CUDA_GENERATED_OUTPUT_DIR:PATH=
 CUDA_HOST_COMPILATION_CPP:BOOL=ON
 
 //Host side compiler used by NVCC
-CUDA_HOST_COMPILER:FILEPATH=/usr/bin/cc
+CUDA_HOST_COMPILER:FILEPATH=/usr/bin/gcc
 
 //Path to a program.
-CUDA_NVCC_EXECUTABLE:FILEPATH=/usr/local/cuda/bin/nvcc
+CUDA_NVCC_EXECUTABLE:FILEPATH=/Developer/NVIDIA/CUDA-5.0/bin/nvcc
 
 //Semi-colon delimit multiple arguments.
 CUDA_NVCC_FLAGS:STRING=
@@ -241,10 +241,10 @@ CUDA_PROPAGATE_HOST_FLAGS:BOOL=ON
 CUDA_SDK_ROOT_DIR:PATH=CUDA_SDK_ROOT_DIR-NOTFOUND
 
 //Path to a file.
-CUDA_TOOLKIT_INCLUDE:PATH=/usr/local/cuda/include
+CUDA_TOOLKIT_INCLUDE:PATH=/Developer/NVIDIA/CUDA-5.0/include
 
 //Toolkit location.
-CUDA_TOOLKIT_ROOT_DIR:PATH=/usr/local/cuda
+CUDA_TOOLKIT_ROOT_DIR:PATH=/Developer/NVIDIA/CUDA-5.0
 
 //Print out the commands run while compiling the CUDA source file.
 //  With the Makefile generator this defaults to VERBOSE variable
@@ -256,19 +256,19 @@ CUDA_VERBOSE_BUILD:BOOL=OFF
 CUDA_VERSION:STRING=5.0
 
 //"cublas" library
-CUDA_cublas_LIBRARY:FILEPATH=/usr/local/cuda/lib/libcublas.dylib
+CUDA_cublas_LIBRARY:FILEPATH=/Developer/NVIDIA/CUDA-5.0/lib/libcublas.dylib
 
 //"cufft" library
-CUDA_cufft_LIBRARY:FILEPATH=/usr/local/cuda/lib/libcufft.dylib
+CUDA_cufft_LIBRARY:FILEPATH=/Developer/NVIDIA/CUDA-5.0/lib/libcufft.dylib
 
 //"curand" library
-CUDA_curand_LIBRARY:FILEPATH=/usr/local/cuda/lib/libcurand.dylib
+CUDA_curand_LIBRARY:FILEPATH=/Developer/NVIDIA/CUDA-5.0/lib/libcurand.dylib
 
 //"cusparse" library
-CUDA_cusparse_LIBRARY:FILEPATH=/usr/local/cuda/lib/libcusparse.dylib
+CUDA_cusparse_LIBRARY:FILEPATH=/Developer/NVIDIA/CUDA-5.0/lib/libcusparse.dylib
 
 //"npp" library
-CUDA_npp_LIBRARY:FILEPATH=/usr/local/cuda/lib/libnpp.dylib
+CUDA_npp_LIBRARY:FILEPATH=/Developer/NVIDIA/CUDA-5.0/lib/libnpp.dylib
 
 //Set to OFF to no search for CUDA
 INCLUDE_CUDA:BOOL=ON
@@ -288,14 +288,17 @@ PYTHON_LIBRARY:FILEPATH=/usr/local/lib/libpython2.7.dylib
 //Add module stocuda shared
 PYTHON_MODULE_stocuda_BUILD_SHARED:BOOL=ON
 
-//Value Computed by CMake
-hello_BINARY_DIR:STATIC=/Users/tel/git/stocuda/build
+//Dependencies for the target
+hazard_LIB_DEPENDS:STATIC=general;/Developer/NVIDIA/CUDA-5.0/lib/libcudart.dylib;general;-Wl,-rpath;general;-Wl,/Developer/NVIDIA/CUDA-5.0/lib;general;/Library/Frameworks/cuda.framework;
 
 //Value Computed by CMake
-hello_SOURCE_DIR:STATIC=/Users/tel/git/stocuda
+stocuda_BINARY_DIR:STATIC=/Users/tel/git/stocuda/build
 
 //Dependencies for the target
-stocuda_LIB_DEPENDS:STATIC=general;/usr/local/lib/libboost_python-mt.dylib;general;/usr/local/lib/libpython2.7.dylib;
+stocuda_LIB_DEPENDS:STATIC=general;/usr/local/lib/libboost_python-mt.dylib;general;/usr/local/lib/libpython2.7.dylib;general;hazard;
+
+//Value Computed by CMake
+stocuda_SOURCE_DIR:STATIC=/Users/tel/git/stocuda
 
 
 ########################
@@ -437,6 +440,9 @@ CMAKE_USE_RELATIVE_PATHS-ADVANCED:INTERNAL=1
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CUDA_64_BIT_DEVICE_CODE
 CUDA_64_BIT_DEVICE_CODE-ADVANCED:INTERNAL=1
+//List of intermediate files that are part of the cuda dependency
+// scanning.
+CUDA_ADDITIONAL_CLEAN_FILES:INTERNAL=/Users/tel/git/stocuda/build/src/CMakeFiles/hazard.dir//hazard_generated_hazard.cu.o.depend
 //ADVANCED property for variable: CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE
 CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CUDA_CUDART_LIBRARY
@@ -468,7 +474,7 @@ CUDA_SDK_ROOT_DIR_INTERNAL:INTERNAL=CUDA_SDK_ROOT_DIR-NOTFOUND
 CUDA_TOOLKIT_INCLUDE-ADVANCED:INTERNAL=1
 //This is the value of the last time CUDA_TOOLKIT_ROOT_DIR was
 // set successfully.
-CUDA_TOOLKIT_ROOT_DIR_INTERNAL:INTERNAL=/usr/local/cuda
+CUDA_TOOLKIT_ROOT_DIR_INTERNAL:INTERNAL=/Developer/NVIDIA/CUDA-5.0
 //ADVANCED property for variable: CUDA_VERSION
 CUDA_VERSION-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CUDA_cublas_LIBRARY
@@ -488,7 +494,9 @@ CUDA_parse_cubin:INTERNAL=/Applications/CMake 2.8-10.app/Contents/share/cmake-2.
 //Location of run_nvcc.cmake
 CUDA_run_nvcc:INTERNAL=/Applications/CMake 2.8-10.app/Contents/share/cmake-2.8/Modules/FindCUDA/run_nvcc.cmake
 //Details about finding CUDA
-FIND_PACKAGE_MESSAGE_DETAILS_CUDA:INTERNAL=[/usr/local/cuda][/usr/local/cuda/bin/nvcc][/usr/local/cuda/include][/usr/local/cuda/lib/libcudart.dylib][v5.0()]
+FIND_PACKAGE_MESSAGE_DETAILS_CUDA:INTERNAL=[/Developer/NVIDIA/CUDA-5.0][/Developer/NVIDIA/CUDA-5.0/bin/nvcc][/Developer/NVIDIA/CUDA-5.0/include][/Developer/NVIDIA/CUDA-5.0/lib/libcudart.dylib][v5.0()]
+//Details about finding NUMPY
+FIND_PACKAGE_MESSAGE_DETAILS_NUMPY:INTERNAL=/Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include1.8.0.dev-5c944b9
 //Details about finding PythonInterp
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/usr/local/bin/python][v2.7.3()]
 //Details about finding PythonLibs

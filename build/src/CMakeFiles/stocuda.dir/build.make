@@ -56,15 +56,15 @@ src/CMakeFiles/stocuda.dir/hazard.cc.o: src/CMakeFiles/stocuda.dir/flags.make
 src/CMakeFiles/stocuda.dir/hazard.cc.o: ../src/hazard.cc
 	$(CMAKE_COMMAND) -E cmake_progress_report /Users/tel/git/stocuda/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/stocuda.dir/hazard.cc.o"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/stocuda.dir/hazard.cc.o -c /Users/tel/git/stocuda/src/hazard.cc
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/stocuda.dir/hazard.cc.o -c /Users/tel/git/stocuda/src/hazard.cc
 
 src/CMakeFiles/stocuda.dir/hazard.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/stocuda.dir/hazard.cc.i"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/tel/git/stocuda/src/hazard.cc > CMakeFiles/stocuda.dir/hazard.cc.i
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/tel/git/stocuda/src/hazard.cc > CMakeFiles/stocuda.dir/hazard.cc.i
 
 src/CMakeFiles/stocuda.dir/hazard.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/stocuda.dir/hazard.cc.s"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/tel/git/stocuda/src/hazard.cc -o CMakeFiles/stocuda.dir/hazard.cc.s
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/tel/git/stocuda/src/hazard.cc -o CMakeFiles/stocuda.dir/hazard.cc.s
 
 src/CMakeFiles/stocuda.dir/hazard.cc.o.requires:
 .PHONY : src/CMakeFiles/stocuda.dir/hazard.cc.o.requires
@@ -79,15 +79,15 @@ src/CMakeFiles/stocuda.dir/pnet.cc.o: src/CMakeFiles/stocuda.dir/flags.make
 src/CMakeFiles/stocuda.dir/pnet.cc.o: ../src/pnet.cc
 	$(CMAKE_COMMAND) -E cmake_progress_report /Users/tel/git/stocuda/build/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/stocuda.dir/pnet.cc.o"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/stocuda.dir/pnet.cc.o -c /Users/tel/git/stocuda/src/pnet.cc
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/stocuda.dir/pnet.cc.o -c /Users/tel/git/stocuda/src/pnet.cc
 
 src/CMakeFiles/stocuda.dir/pnet.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/stocuda.dir/pnet.cc.i"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/tel/git/stocuda/src/pnet.cc > CMakeFiles/stocuda.dir/pnet.cc.i
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/tel/git/stocuda/src/pnet.cc > CMakeFiles/stocuda.dir/pnet.cc.i
 
 src/CMakeFiles/stocuda.dir/pnet.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/stocuda.dir/pnet.cc.s"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/tel/git/stocuda/src/pnet.cc -o CMakeFiles/stocuda.dir/pnet.cc.s
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/tel/git/stocuda/src/pnet.cc -o CMakeFiles/stocuda.dir/pnet.cc.s
 
 src/CMakeFiles/stocuda.dir/pnet.cc.o.requires:
 .PHONY : src/CMakeFiles/stocuda.dir/pnet.cc.o.requires
@@ -102,15 +102,15 @@ src/CMakeFiles/stocuda.dir/stocuda.cc.o: src/CMakeFiles/stocuda.dir/flags.make
 src/CMakeFiles/stocuda.dir/stocuda.cc.o: ../src/stocuda.cc
 	$(CMAKE_COMMAND) -E cmake_progress_report /Users/tel/git/stocuda/build/CMakeFiles $(CMAKE_PROGRESS_3)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/stocuda.dir/stocuda.cc.o"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/stocuda.dir/stocuda.cc.o -c /Users/tel/git/stocuda/src/stocuda.cc
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/stocuda.dir/stocuda.cc.o -c /Users/tel/git/stocuda/src/stocuda.cc
 
 src/CMakeFiles/stocuda.dir/stocuda.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/stocuda.dir/stocuda.cc.i"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/tel/git/stocuda/src/stocuda.cc > CMakeFiles/stocuda.dir/stocuda.cc.i
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/tel/git/stocuda/src/stocuda.cc > CMakeFiles/stocuda.dir/stocuda.cc.i
 
 src/CMakeFiles/stocuda.dir/stocuda.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/stocuda.dir/stocuda.cc.s"
-	cd /Users/tel/git/stocuda/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/tel/git/stocuda/src/stocuda.cc -o CMakeFiles/stocuda.dir/stocuda.cc.s
+	cd /Users/tel/git/stocuda/build/src && /usr/bin/g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/tel/git/stocuda/src/stocuda.cc -o CMakeFiles/stocuda.dir/stocuda.cc.s
 
 src/CMakeFiles/stocuda.dir/stocuda.cc.o.requires:
 .PHONY : src/CMakeFiles/stocuda.dir/stocuda.cc.o.requires
@@ -136,6 +136,8 @@ src/stocuda.so: src/CMakeFiles/stocuda.dir/stocuda.cc.o
 src/stocuda.so: src/CMakeFiles/stocuda.dir/build.make
 src/stocuda.so: /usr/local/lib/libboost_python-mt.dylib
 src/stocuda.so: /usr/local/lib/libpython2.7.dylib
+src/stocuda.so: src/libhazard.a
+src/stocuda.so: /Developer/NVIDIA/CUDA-5.0/lib/libcudart.dylib
 src/stocuda.so: src/CMakeFiles/stocuda.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX shared module stocuda.so"
 	cd /Users/tel/git/stocuda/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/stocuda.dir/link.txt --verbose=$(VERBOSE)

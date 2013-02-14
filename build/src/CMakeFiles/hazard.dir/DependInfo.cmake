@@ -1,18 +1,10 @@
 # The set of languages for which implicit dependencies are needed:
 SET(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
   )
 # The set of files for implicit dependencies of each language:
-SET(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/tel/git/stocuda/src/hazard.cc" "/Users/tel/git/stocuda/build/src/CMakeFiles/stocuda.dir/hazard.cc.o"
-  "/Users/tel/git/stocuda/src/pnet.cc" "/Users/tel/git/stocuda/build/src/CMakeFiles/stocuda.dir/pnet.cc.o"
-  "/Users/tel/git/stocuda/src/stocuda.cc" "/Users/tel/git/stocuda/build/src/CMakeFiles/stocuda.dir/stocuda.cc.o"
-  )
-SET(CMAKE_CXX_COMPILER_ID "GNU")
 
 # Targets to which this target links.
 SET(CMAKE_TARGET_LINKED_INFO_FILES
-  "/Users/tel/git/stocuda/build/src/CMakeFiles/hazard.dir/DependInfo.cmake"
   )
 
 # The include file search paths:

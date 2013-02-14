@@ -102,6 +102,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named hazard
+
+# Build rule for target.
+hazard: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 hazard
+.PHONY : hazard
+
+# fast build rule for target.
+hazard/fast:
+	$(MAKE) -f src/CMakeFiles/hazard.dir/build.make src/CMakeFiles/hazard.dir/build
+.PHONY : hazard/fast
+
+#=============================================================================
 # Target rules for targets named stocuda
 
 # Build rule for target.
@@ -122,6 +135,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... hazard"
 	@echo "... stocuda"
 .PHONY : help
 

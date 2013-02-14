@@ -154,6 +154,17 @@ public:
 	/// Gillespie specific methods
 	/// move the network n steps forward according to the Gillespie algorithm, record results by overwriting M
 	void Gillespie(int n=1);
+
+//	void AddVec(float * i, float * j, float * p, int width);
+//
+//	float AddVecTest() {
+//		float a[] = {1,2,3,4};
+//		float b[] = {61,62,63,64};
+//		float p[4];
+//
+//		AddVec(a, b, p, 4);
+//		return p[0]+p[1]+p[2]+p[3];
+//	}
 };
 
 #endif /* PNET_HH_ */

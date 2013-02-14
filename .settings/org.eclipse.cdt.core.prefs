@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/CC/delimiter=\:
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/CC/operation=replace
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/CC/value=gcc
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/CXX/delimiter=\:
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/CXX/operation=replace
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/CXX/value=g++
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/append=true
+environment/project/com.nvidia.cuda.ide.toolchain.base.921100823/appendContributed=true

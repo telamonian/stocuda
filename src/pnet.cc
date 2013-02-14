@@ -30,11 +30,12 @@ void Pnet::Gillespie(int n) {
 			++j;
 			tsum += H.H(j,0);
 		}
+		//std::cout << "reaction #" << j << " fired" << std::endl;
 		UpdateM(j);
 		//for (int k = 0; k < M.size1(); ++k)
 		    //std::cout << &(M.data()[0]) + k << '\t' << *(&(M.data()[0]) + k) << '\t' ;
 		//std::cout << std::endl;
-		std::cout << t << '\t' << M << std::endl;
+		std::cout << i << '\t' << t << '\t' << M << std::endl;
 
 		/// prep random number generators for next round
 		dt.param(H.H0);
@@ -43,6 +44,10 @@ void Pnet::Gillespie(int n) {
 
 void Pnet::UpdateM(int i) {
 	M = M + project(S, range(0,M.size1()), range(i,i+1)); //column(S, i);
+	//std::cout << "pointers to pnet M:\n";
+	//for (i=0;i<M.size1();++i){
+	//	std::cout << &(M.data()[0]) + i << ' ' << M(i,0) << std::endl;
+	//}
 	H.Update(M);
 }
 

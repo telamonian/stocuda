@@ -11,4 +11,5 @@ BOOST_PYTHON_MODULE(stocuda)
             numpy_matrix<int>,
             numpy_matrix<double> >())
         .def("Gillespie", &Pnet::Gillespie);
+//    	.def("AddVecTest", &Pnet::AddVecTest);
 }
