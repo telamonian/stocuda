@@ -9,13 +9,11 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/odeint.hpp>
 #include <iostream>
 #include <time.h>
 #include "pnet.hh"
 
 using namespace boost::numeric::ublas;
-using namespace boost::numeric::odeint;
 
 void Pnet::Gillespie(int n) {
 	FLOATT chance;

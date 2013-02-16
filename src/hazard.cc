@@ -9,12 +9,8 @@
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/range/irange.hpp>
 #include <iostream>
 #include <cmath>
-#include <boost/function.hpp>
-#include <boost/fusion/include/accumulate.hpp>
-#include <boost/fusion/algorithm/iteration/accumulate.hpp>
 #include "hazard.hh"
 
 using namespace pyublas;

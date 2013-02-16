@@ -11,9 +11,7 @@
 
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/function.hpp>
 
 using namespace pyublas;
 using namespace boost::numeric::ublas;

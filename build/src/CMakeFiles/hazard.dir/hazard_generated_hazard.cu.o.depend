@@ -337,8 +337,6 @@ SET(CUDA_NVCC_DEPEND
  "/usr/local/include/boost/exception/exception.hpp"
  "/usr/local/include/boost/foreach.hpp"
  "/usr/local/include/boost/foreach_fwd.hpp"
- "/usr/local/include/boost/function.hpp"
- "/usr/local/include/boost/function/detail/function_iterate.hpp"
  "/usr/local/include/boost/function/detail/maybe_include.hpp"
  "/usr/local/include/boost/function/detail/prologue.hpp"
  "/usr/local/include/boost/function/function0.hpp"
