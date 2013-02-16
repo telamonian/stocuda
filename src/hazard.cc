@@ -4,6 +4,7 @@
  *  Created on: Jan 9, 2013
  *      Author: tel
  */
+#define FLOATT float
 
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -19,17 +20,17 @@
 using namespace pyublas;
 using namespace boost::numeric::ublas;
 
-typedef double (*rl_pointer)(double, int , int );
+typedef FLOATT (*rl_pointer)(FLOATT, int , int );
 typedef matrix<int>::iterator1 i1_t;
 typedef matrix<int>::iterator2 i2_t;
 
-//double rl_00(double c, int * M1, int * M2);
-//double rl_10(double c, int * M1, int * M2);
-//double rl_11(double c, int * M1, int * M2);
-//double rl_20(double c, int * M1, int * M2);
+//FLOATT rl_00(FLOATT c, int * M1, int * M2);
+//FLOATT rl_10(FLOATT c, int * M1, int * M2);
+//FLOATT rl_11(FLOATT c, int * M1, int * M2);
+//FLOATT rl_20(FLOATT c, int * M1, int * M2);
 
 //void Hazard::Update(matrix<int> M) {
-//	static const scalar_matrix<double> summer (scalar_matrix<double> (1, H.size1(), 1));
+//	static const scalar_matrix<FLOATT> summer (scalar_matrix<FLOATT> (1, H.size1(), 1));
 //
 //	for (int i = 0; i<HFunc.size1(); ++i) {
 //	    //std::cout << MPtrs(i, 0) << '\t';

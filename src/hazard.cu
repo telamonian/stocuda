@@ -1,3 +1,5 @@
+#define FLOATT float
+
 #include <cuda.h>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -5,38 +7,38 @@
 
 using namespace boost::numeric::ublas;
 
-typedef double (*rl_pointer)(double, int, int);
+typedef FLOATT (*rl_pointer)(FLOATT, int, int);
 
-__global__ void UpdateKernel(int * Md, double * cd, rl_pointer * HFuncd, double * Hd, int width);
-__device__ double rl_00(double c, int  M1, int  M2);
-__device__ double rl_10(double c, int  M1, int  M2);
-__device__ double rl_11(double c, int  M1, int  M2);
-__device__ double rl_20(double c, int  M1, int  M2);
+__global__ void UpdateKernel(int * Md, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width);
+__device__ FLOATT rl_00(FLOATT c, int  M1, int  M2);
+__device__ FLOATT rl_10(FLOATT c, int  M1, int  M2);
+__device__ FLOATT rl_11(FLOATT c, int  M1, int  M2);
+__device__ FLOATT rl_20(FLOATT c, int  M1, int  M2);
 
-__device__ double rl_00(double c, int  M1, int  M2) {
+__device__ FLOATT rl_00(FLOATT c, int  M1, int  M2) {
     //std::cout << "rl_00" << std::endl;
 	return c;
 }
 
-__device__ double rl_10(double c, int  M1, int  M2) {
+__device__ FLOATT rl_10(FLOATT c, int  M1, int  M2) {
 	//std::cout << "rl_10" << '\t' << M1 << std::endl;
 	return c*M1;
 }
 
-__device__ double rl_11(double c, int  M1, int  M2) {
+__device__ FLOATT rl_11(FLOATT c, int  M1, int  M2) {
     //std::cout << "rl_11" << '\t' << M1 << '\t' << M2 << std::endl;
 	return c*M1*M2;
 }
 
-__device__ double rl_20(double c, int  M1, int  M2) {
+__device__ FLOATT rl_20(FLOATT c, int  M1, int  M2) {
     //std::cout << "rl_20" << '\t' << M1 << std::endl;
 	return (c/2)*M1*(M1-1);
 }
 
-__device__ rl_pointer prl_00 = rl_00;
-__device__ rl_pointer prl_10 = rl_10;
-__device__ rl_pointer prl_20 = rl_20;
-__device__ rl_pointer prl_11 = rl_11;
+const __device__ rl_pointer prl_00 = rl_00;
+const __device__ rl_pointer prl_10 = rl_10;
+const __device__ rl_pointer prl_20 = rl_20;
+const __device__ rl_pointer prl_11 = rl_11;
 
 matrix<rl_pointer> Hazard::InitHFunc() {
 	matrix<rl_pointer> hfunc(c.size1(), 1);
@@ -114,17 +116,17 @@ matrix<int> Hazard::InitMPtrs(matrix<int> &M) {
 }
 
 void Hazard::Update(matrix<int> M) {
-	static const scalar_matrix<double> summer (scalar_matrix<double> (1, H.size1(), 1));
+	static const scalar_matrix<FLOATT> summer (scalar_matrix<FLOATT> (1, H.size1(), 1));
 
 	int * Mh, * Md;
-	double * cd;
+	FLOATT * cd;
 	rl_pointer * HFuncd;
-	double * Hd;
+	FLOATT * Hd;
 
-	int sizemd = MPtrs.size1() * 2 * sizeof(int);
-	int sizec = c.size1() * sizeof(double);
-	int sizehfunc = HFunc.size1() * sizeof(rl_pointer);
-	int sizeh = H.size1() * sizeof(double);
+	const int sizemd = MPtrs.size1() * 2 * sizeof(int);
+	const int sizec = c.size1() * sizeof(FLOATT);
+	const int sizehfunc = HFunc.size1() * sizeof(rl_pointer);
+	const int sizeh = H.size1() * sizeof(FLOATT);
 
 	//std::cout << sizemd << '\t' << MPtrs.size1() << '\t' << sizeof(int) << '\t' << std::endl;
 
@@ -158,7 +160,7 @@ void Hazard::Update(matrix<int> M) {
 	cudaMalloc((void**) &Hd, sizeh);
 
 	dim3 dimBlock(1024, 1, 1);
-	dim3 dimGrid(H.size1()/1024 + 1, 1, 1);
+	dim3 dimGrid(H.size1() +1, 1, 1);
 
 	UpdateKernel<<<dimGrid, dimBlock>>>(Md, cd, HFuncd, Hd, H.size1());
 
@@ -172,8 +174,8 @@ void Hazard::Update(matrix<int> M) {
 	//std::cout << "H0 is: " << H0 << std::endl;
 }
 
-__global__ void UpdateKernel(int * Md, double * cd, rl_pointer * HFuncd, double * Hd, int width) {
-	int tx = threadIdx.x;
+__global__ void UpdateKernel(int * Md, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width) {
+	int tx = threadIdx.x + (blockDim.x*blockIdx.x);
 
 
 	if (tx < width) {

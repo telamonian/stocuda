@@ -7,6 +7,7 @@
 
 #ifndef HAZARD_HH_
 #define HAZARD_HH_
+#define FLOATT float
 
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -20,7 +21,7 @@ using namespace boost::numeric::ublas;
 class Hazard {
 
 public:
-	typedef double (*rl_pointer)(double, int , int );
+	typedef FLOATT (*rl_pointer)(FLOATT, int , int );
 
 	/// constructors
 	/// default
@@ -46,7 +47,7 @@ public:
 		HFunc(v, 1) {}
 
 	/// initialized from premade matrices
-	Hazard(matrix<int>Prei, matrix<int> Posti, matrix<int> &Mi, matrix<double> ci):
+	Hazard(matrix<int>Prei, matrix<int> Posti, matrix<int> &Mi, matrix<FLOATT> ci):
 		Pre(Prei),
 		Post(Posti),
 		c(ci),
@@ -59,10 +60,10 @@ public:
 
 	const matrix<int> Pre;
 	const matrix<int> Post;
-	const matrix<double> c;
-	const matrix<double> S;
-	matrix<double> H;
-	double H0;
+	const matrix<FLOATT> c;
+	const matrix<FLOATT> S;
+	matrix<FLOATT> H;
+	FLOATT H0;
 	matrix<int> Order;
 	matrix<int> InitOrder();
 	matrix<int> MPtrs;
@@ -73,7 +74,7 @@ public:
 	//void Update();
 	void Update(matrix<int> M);
 
-	matrix<double> InitS() {
+	matrix<FLOATT> InitS() {
 		return trans(Post-Pre);
 	}
 };

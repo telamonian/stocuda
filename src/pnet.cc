@@ -4,6 +4,7 @@
  *  Created on: Jan 3, 2013
  *      Author: tel
  */
+#define FLOATT float
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
@@ -17,8 +18,8 @@ using namespace boost::numeric::ublas;
 using namespace boost::numeric::odeint;
 
 void Pnet::Gillespie(int n) {
-	double chance;
-	double tsum;
+	FLOATT chance;
+	FLOATT tsum;
 	int j;
 	for (int i = 0; i < n; ++i) {
 		t = t + dt(mtgen);
@@ -35,11 +36,11 @@ void Pnet::Gillespie(int n) {
 		//for (int k = 0; k < M.size1(); ++k)
 		    //std::cout << &(M.data()[0]) + k << '\t' << *(&(M.data()[0]) + k) << '\t' ;
 		//std::cout << std::endl;
-		std::cout << i << '\t' << t << '\t' << M << std::endl;
 
 		/// prep random number generators for next round
 		dt.param(H.H0);
 	}
+	std::cout << t << '\t' << M << std::endl;
 }
 
 void Pnet::UpdateM(int i) {

@@ -1,3 +1,5 @@
+#define FLOATT float
+
 #include <pyublas/numpy.hpp>
 #include "pnet.hh"
 
@@ -9,7 +11,7 @@ BOOST_PYTHON_MODULE(stocuda)
     class_<Pnet>("Pnet", init<numpy_matrix<int>,
             numpy_matrix<int>,
             numpy_matrix<int>,
-            numpy_matrix<double> >())
+            numpy_matrix<FLOATT> >())
         .def("Gillespie", &Pnet::Gillespie);
 //    	.def("AddVecTest", &Pnet::AddVecTest);
 }

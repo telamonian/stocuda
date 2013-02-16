@@ -418,6 +418,28 @@ _numpyconfig.h
 
 /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/utils.h
 
+/Users/tel/git/stocuda/src/hazard.cc
+pyublas/numpy.hpp
+-
+boost/numeric/ublas/matrix.hpp
+-
+boost/numeric/ublas/io.hpp
+-
+boost/range/irange.hpp
+-
+iostream
+-
+cmath
+-
+boost/function.hpp
+-
+boost/fusion/include/accumulate.hpp
+-
+boost/fusion/algorithm/iteration/accumulate.hpp
+-
+hazard.hh
+/Users/tel/git/stocuda/src/hazard.hh
+
 /Users/tel/git/stocuda/src/hazard.hh
 pyublas/numpy.hpp
 -
@@ -467,6 +489,12 @@ string
 -
 hazard.hh
 /Users/tel/git/stocuda/src/hazard.hh
+
+/Users/tel/git/stocuda/src/stocuda.cc
+pyublas/numpy.hpp
+-
+pnet.hh
+/Users/tel/git/stocuda/src/pnet.hh
 
 /usr/local/include/boost/algorithm/string/config.hpp
 boost/config.hpp
@@ -4039,6 +4067,10 @@ boost/fusion/functional/invocation/detail/that_ptr.hpp
 -
 
 /usr/local/include/boost/fusion/functional/invocation/limits.hpp
+
+/usr/local/include/boost/fusion/include/accumulate.hpp
+boost/fusion/algorithm/iteration/accumulate.hpp
+-
 
 /usr/local/include/boost/fusion/include/all.hpp
 boost/fusion/algorithm/query/all.hpp
@@ -17196,6 +17228,14 @@ boost/mpl/has_xxx.hpp
 boost/range/iterator.hpp
 -
 boost/utility/enable_if.hpp
+-
+
+/usr/local/include/boost/range/irange.hpp
+boost/assert.hpp
+-
+boost/iterator/iterator_facade.hpp
+-
+boost/range/iterator_range.hpp
 -
 
 /usr/local/include/boost/range/iterator.hpp

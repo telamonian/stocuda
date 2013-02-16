@@ -4,6 +4,7 @@
  *  Created on: Jan 3, 2013
  *      Author: tel
  */
+#define FLOATT float
 
 #ifndef PNET_HH_
 #define PNET_HH_
@@ -59,7 +60,7 @@ public:
 		uni(0, 1) {}
 
 	/// initialized from premade matrices
-// 	Pnet(numpy_matrix<std::string> Pi, numpy_matrix<std::string> Ti, numpy_matrix<int> Prei, numpy_matrix<int> Posti, numpy_matrix<int> Mi, matrix<double> ci):
+// 	Pnet(numpy_matrix<std::string> Pi, numpy_matrix<std::string> Ti, numpy_matrix<int> Prei, numpy_matrix<int> Posti, numpy_matrix<int> Mi, matrix<FLOATT> ci):
 // 		P(Pi),
 // 		T(Ti),
 // 		Pre(Prei),
@@ -75,7 +76,7 @@ public:
 // 		uni(0, 1) {}
 		
     /// 'stubby' initializer to test pyublas
-    Pnet(numpy_matrix<int> Prei, numpy_matrix<int> Posti, numpy_matrix<int> Mi, numpy_matrix<double> ci):
+    Pnet(numpy_matrix<int> Prei, numpy_matrix<int> Posti, numpy_matrix<int> Mi, numpy_matrix<FLOATT> ci):
 		//P(),
 		//T(),
 		Pre(Prei),
@@ -107,10 +108,10 @@ public:
 	matrix<int> M;
 
 	/// v x 1 column vector of stochastic rate constants
-	matrix<double> c;
+	matrix<FLOATT> c;
 
 	/// simulation time
-	double t;
+	FLOATT t;
 
 	/// v x u reaction matrix
 	matrix<int> A;
@@ -132,7 +133,7 @@ public:
 
 	/// methods
 	/// utility methods
-//	double EWSum(matrix<double> m);
+//	FLOATT EWSum(matrix<FLOATT> m);
 
 	/// initalization methods
 	/// initialize reaction matrix
