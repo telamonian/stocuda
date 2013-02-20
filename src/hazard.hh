@@ -20,7 +20,6 @@ using namespace boost::numeric::ublas;
 class Hazard {
 
 public:
-	typedef FLOATT (*rl_pointer)(FLOATT, int , int );
 
 	/// constructors
 	/// default
@@ -55,7 +54,7 @@ public:
 		S(InitS()),
 		MPtrs(InitMPtrs(Mi)),
 		HFunc(InitHFunc()) {
-		MallocGlobal();
+		InitGlobal();
 		Update(Mi);
 	}
 
@@ -75,7 +74,7 @@ public:
 	//void Update();
 	void Update(matrix<int> M);
 
-	void MallocGlobal();
+	void InitGlobal();
 
 	matrix<FLOATT> InitS() {
 		return trans(Post-Pre);

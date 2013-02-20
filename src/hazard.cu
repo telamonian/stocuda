@@ -15,10 +15,10 @@ PROF_ALLOC;
 
 using namespace boost::numeric::ublas;
 
-typedef FLOATT (*rl_pointer)(FLOATT, int, int);
+typedef FLOATT (*rl_pointer)(FLOATT, int *, int *);
 
-int * Mh;
-__device__ int* Md;
+__device__ int * Md;
+__device__ int ** MdPtrs;
 __device__ FLOATT * cd;
 __device__ rl_pointer * HFuncd;
 __device__ FLOATT * Hd;
@@ -28,48 +28,37 @@ int sizec;
 int sizehfunc;
 int sizeh;
 
-__global__ void UpdateKernel(int * Md, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width);
-__device__ FLOATT rl_00(FLOATT c, int  M1, int  M2);
-__device__ FLOATT rl_10(FLOATT c, int  M1, int  M2);
-__device__ FLOATT rl_11(FLOATT c, int  M1, int  M2);
-__device__ FLOATT rl_20(FLOATT c, int  M1, int  M2);
+__global__ void UpdateKernel(int * Md, int ** MdPtrs, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width);
+__global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, const int width);
+__device__ FLOATT rl_00(FLOATT c, int * M1, int * M2);
+__device__ FLOATT rl_10(FLOATT c, int * M1, int * M2);
+__device__ FLOATT rl_11(FLOATT c, int * M1, int * M2);
+__device__ FLOATT rl_20(FLOATT c, int * M1, int * M2);
 
-__device__ FLOATT rl_00(FLOATT c, int  M1, int  M2) {
+__device__ FLOATT rl_00(FLOATT c, int * M1, int * M2) {
     //std::cout << "rl_00" << std::endl;
 	return c;
 }
 
-__device__ FLOATT rl_10(FLOATT c, int  M1, int  M2) {
+__device__ FLOATT rl_10(FLOATT c, int * M1, int * M2) {
 	//std::cout << "rl_10" << '\t' << M1 << std::endl;
-	return c*M1;
+	return c*(*M1);
 }
 
-__device__ FLOATT rl_11(FLOATT c, int  M1, int  M2) {
+__device__ FLOATT rl_11(FLOATT c, int * M1, int * M2) {
     //std::cout << "rl_11" << '\t' << M1 << '\t' << M2 << std::endl;
-	return c*M1*M2;
+	return c*(*M1)*(*M2);
 }
 
-__device__ FLOATT rl_20(FLOATT c, int  M1, int  M2) {
+__device__ FLOATT rl_20(FLOATT c, int * M1, int * M2) {
     //std::cout << "rl_20" << '\t' << M1 << std::endl;
-	return (c/2)*M1*(M1-1);
+	return (c/2)*(*M1)*((*M1)-1);
 }
 
 const __device__ rl_pointer prl_00 = rl_00;
 const __device__ rl_pointer prl_10 = rl_10;
 const __device__ rl_pointer prl_20 = rl_20;
 const __device__ rl_pointer prl_11 = rl_11;
-
-void Hazard::MallocGlobal() {
-	sizemd = MPtrs.size1() * 2 * sizeof(int);
-	sizec = c.size1() * sizeof(FLOATT);
-	sizehfunc = HFunc.size1() * sizeof(rl_pointer);
-	sizeh = H.size1() * sizeof(FLOATT);
-	Mh = (int*)malloc(sizemd);
-	cudaMalloc((void**) &Md, sizemd);
-	cudaMalloc((void**) &cd, sizec);
-	cudaMalloc((void**) &HFuncd, sizehfunc);
-	cudaMalloc((void**) &Hd, sizeh);
-}
 
 matrix<rl_pointer> Hazard::InitHFunc() {
 	matrix<rl_pointer> hfunc(c.size1(), 1);
@@ -146,6 +135,45 @@ matrix<int> Hazard::InitMPtrs(matrix<int> &M) {
 	return mptrs;
 }
 
+void Hazard::InitGlobal() {
+	int sizemptrs = c.size1() * 2 * sizeof(int);
+	int sizemdptrs = c.size1() * 2 * sizeof(int*);
+	sizemd = Pre.size2() * sizeof(int);
+	sizec = c.size1() * sizeof(FLOATT);
+	sizehfunc = HFunc.size1() * sizeof(rl_pointer);
+	sizeh = H.size1() * sizeof(FLOATT);
+
+	cudaMalloc((void**) &Md, sizemd);
+	cudaMalloc((void**) &MdPtrs, sizemdptrs);
+	cudaMalloc((void**) &cd, sizec);
+	cudaMalloc((void**) &HFuncd, sizehfunc);
+	cudaMalloc((void**) &Hd, sizeh);
+
+	cudaMemcpy(cd, &(c.data()[0]), sizec, cudaMemcpyHostToDevice);
+	cudaMemcpy(HFuncd, &(HFunc.data()[0]), sizehfunc, cudaMemcpyHostToDevice);
+
+	int * MdIndex;
+	cudaMalloc((void**) &MdIndex, sizemptrs);
+	cudaMemcpy(MdIndex, &(MPtrs.data()[0]), sizemptrs, cudaMemcpyHostToDevice);
+
+	dim3 dimBlock(32, 1, 1);
+	dim3 dimGrid(H.size1()/32 + 1, 1, 1);
+	InitMdPtrs<<<dimGrid, dimBlock>>>(Md, MdIndex, MdPtrs, sizemdptrs);
+	cudaDeviceSynchronize();
+
+	cudaFree(MdIndex);
+}
+
+__global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, const int width) {
+	int tx = threadIdx.x + (blockDim.x*blockIdx.x);
+
+	if (tx < width) {
+		MdPtrs[tx] = Md + MdIndex[tx];
+	}
+}
+
+
+
 void Hazard::Update(matrix<int> M) {
 	static const scalar_matrix<FLOATT> summer (scalar_matrix<FLOATT> (1, H.size1(), 1));
 
@@ -206,22 +234,20 @@ void Hazard::Update(matrix<int> M) {
 	PROF_BEGIN(PROF_CUDAMEMCOPY_TO);
 	#endif
 
-	cudaMemcpy(Md, Mh, sizemd, cudaMemcpyHostToDevice);
-	cudaMemcpy(cd, &(c.data()[0]), sizec, cudaMemcpyHostToDevice);
-	cudaMemcpy(HFuncd, &(HFunc.data()[0]), sizehfunc, cudaMemcpyHostToDevice);
+	cudaMemcpy(Md, &(M.data()[0]), sizemd, cudaMemcpyHostToDevice);
 
 	#if PROFILE
 	PROF_END(PROF_CUDAMEMCOPY_TO);
 	#endif
 
-	dim3 dimBlock(1024, 1, 1);
-	dim3 dimGrid(H.size1()/1024 + 1, 1, 1);
+	dim3 dimBlock(32, 1, 1);
+	dim3 dimGrid(H.size1()/32 + 1, 1, 1);
 
 	#if PROFILE
 	PROF_BEGIN(PROF_UPDATE_KERNEL);
 	#endif
 
-	UpdateKernel<<<dimGrid, dimBlock>>>(Md, cd, HFuncd, Hd, H.size1());
+	UpdateKernel<<<dimGrid, dimBlock>>>(Md, MdPtrs, cd, HFuncd, Hd, H.size1());
 	cudaDeviceSynchronize();
 
 	#if PROFILE
@@ -246,7 +272,7 @@ void Hazard::Update(matrix<int> M) {
 	//std::cout << "H0 is: " << H0 << std::endl;
 }
 
-__global__ void UpdateKernel(int * Md, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width) {
+__global__ void UpdateKernel(int * Md, int ** MdPtrs, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width) {
 	int tx = threadIdx.x + (blockDim.x*blockIdx.x);
 
 
@@ -257,7 +283,7 @@ __global__ void UpdateKernel(int * Md, const FLOATT * cd, const rl_pointer * HFu
 		//printf("%d %d\t", Md[tx*2], Md[tx*2+1]);
 		//printf("%.3f ", HFuncd[tx](cd[tx], Md[tx*2], Md[tx*2+1]));
 		//printf("%.3f ", Hd[tx]);
-		Hd[tx] = HFuncd[tx](cd[tx], Md[tx*2], Md[tx*2+1]);
+		Hd[tx] = HFuncd[tx](cd[tx], MdPtrs[tx*2], MdPtrs[tx*2+1]);
 		//printf("%.3f %.3f\t", Hd[tx], HFuncd[tx](cd[tx], Md[tx*2], Md[tx*2+1]));
 	}
 }
