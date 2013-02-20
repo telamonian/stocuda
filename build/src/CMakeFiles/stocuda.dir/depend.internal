@@ -78,6 +78,8 @@ src/CMakeFiles/stocuda.dir/hazard.cc.o
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/numpyconfig.h
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/old_defines.h
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/utils.h
+ /Users/tel/git/stocuda/src/Profile.h
+ /Users/tel/git/stocuda/src/ProfileCodes.h
  /Users/tel/git/stocuda/src/hazard.cc
  /Users/tel/git/stocuda/src/hazard.hh
  /usr/local/include/boost/algorithm/string/config.hpp
@@ -1166,6 +1168,8 @@ src/CMakeFiles/stocuda.dir/pnet.cc.o
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/numpyconfig.h
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/old_defines.h
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/utils.h
+ /Users/tel/git/stocuda/src/Profile.h
+ /Users/tel/git/stocuda/src/ProfileCodes.h
  /Users/tel/git/stocuda/src/hazard.hh
  /Users/tel/git/stocuda/src/pnet.cc
  /Users/tel/git/stocuda/src/pnet.hh
@@ -2277,6 +2281,8 @@ src/CMakeFiles/stocuda.dir/stocuda.cc.o
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/numpyconfig.h
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/old_defines.h
  /Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include/numpy/utils.h
+ /Users/tel/git/stocuda/src/Profile.h
+ /Users/tel/git/stocuda/src/ProfileCodes.h
  /Users/tel/git/stocuda/src/hazard.hh
  /Users/tel/git/stocuda/src/pnet.hh
  /Users/tel/git/stocuda/src/stocuda.cc

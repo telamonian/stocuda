@@ -5,6 +5,7 @@
  *      Author: tel
  */
 #define FLOATT float
+#define PROFILE 1
 
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -12,6 +13,11 @@
 #include <iostream>
 #include <cmath>
 #include "hazard.hh"
+
+#if PROFILE
+#include "Profile.h"
+#include "ProfileCodes.h"
+#endif
 
 using namespace pyublas;
 using namespace boost::numeric::ublas;

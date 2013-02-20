@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
+ADD_DEFINITIONS(-DPROF_ENABLE)
 
 project(stocuda)
 SET(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMakeModules )

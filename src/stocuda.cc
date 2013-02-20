@@ -1,7 +1,13 @@
 #define FLOATT float
+#define PROFILE 1
 
 #include <pyublas/numpy.hpp>
 #include "pnet.hh"
+
+#if PROFILE
+#include "Profile.h"
+#include "ProfileCodes.h"
+#endif
 
 using namespace boost::python;
 using namespace pyublas;

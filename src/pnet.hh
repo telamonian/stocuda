@@ -5,9 +5,15 @@
  *      Author: tel
  */
 #define FLOATT float
+#define PROFILE 1
 
 #ifndef PNET_HH_
 #define PNET_HH_
+
+#if PROFILE
+#include "Profile.h"
+#include "ProfileCodes.h"
+#endif
 
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>

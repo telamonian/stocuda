@@ -9,6 +9,7 @@
 #define HAZARD_HH_
 #define FLOATT float
 
+
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -54,7 +55,9 @@ public:
 		S(InitS()),
 		MPtrs(InitMPtrs(Mi)),
 		HFunc(InitHFunc()) {
-		Update(Mi);}
+		MallocGlobal();
+		Update(Mi);
+	}
 
 	const matrix<int> Pre;
 	const matrix<int> Post;
@@ -71,6 +74,8 @@ public:
 
 	//void Update();
 	void Update(matrix<int> M);
+
+	void MallocGlobal();
 
 	matrix<FLOATT> InitS() {
 		return trans(Post-Pre);

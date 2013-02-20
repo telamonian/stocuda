@@ -1,3 +1,4 @@
+#define PROFILE 1
 #define FLOATT float
 
 #include <cuda.h>
@@ -5,9 +6,27 @@
 #include <boost/numeric/ublas/io.hpp>
 #include "hazard.hh"
 
+#if PROFILE
+#include "Profile.h"
+#include "ProfileCodes.h"
+#endif
+
+PROF_ALLOC;
+
 using namespace boost::numeric::ublas;
 
 typedef FLOATT (*rl_pointer)(FLOATT, int, int);
+
+int * Mh;
+__device__ int* Md;
+__device__ FLOATT * cd;
+__device__ rl_pointer * HFuncd;
+__device__ FLOATT * Hd;
+
+int sizemd;
+int sizec;
+int sizehfunc;
+int sizeh;
 
 __global__ void UpdateKernel(int * Md, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width);
 __device__ FLOATT rl_00(FLOATT c, int  M1, int  M2);
@@ -40,6 +59,18 @@ const __device__ rl_pointer prl_10 = rl_10;
 const __device__ rl_pointer prl_20 = rl_20;
 const __device__ rl_pointer prl_11 = rl_11;
 
+void Hazard::MallocGlobal() {
+	sizemd = MPtrs.size1() * 2 * sizeof(int);
+	sizec = c.size1() * sizeof(FLOATT);
+	sizehfunc = HFunc.size1() * sizeof(rl_pointer);
+	sizeh = H.size1() * sizeof(FLOATT);
+	Mh = (int*)malloc(sizemd);
+	cudaMalloc((void**) &Md, sizemd);
+	cudaMalloc((void**) &cd, sizec);
+	cudaMalloc((void**) &HFuncd, sizehfunc);
+	cudaMalloc((void**) &Hd, sizeh);
+}
+
 matrix<rl_pointer> Hazard::InitHFunc() {
 	matrix<rl_pointer> hfunc(c.size1(), 1);
 	int max1;
@@ -49,8 +80,8 @@ matrix<rl_pointer> Hazard::InitHFunc() {
 	for (matrix<int>::const_iterator1 it1 = Pre.begin1(); it1!=Pre.end1(); ++it1) {
 		max1 = 0;
 		max2 = 0;
-		max1i = NULL;
-		max2i = NULL;
+		max1i = -1;
+		max2i = -1;
 		for (matrix<int>::const_iterator2 it2 = it1.begin(); it2!=it1.end(); ++it2) {
 			if (*it2 > max1) {
 				max2 = max1;
@@ -86,8 +117,8 @@ matrix<int> Hazard::InitMPtrs(matrix<int> &M) {
 	for (matrix<int>::const_iterator1 it1 = Pre.begin1(); it1!=Pre.end1(); ++it1) {
 		max1 = 0;
 		max2 = 0;
-		max1i = NULL;
-		max2i = NULL;
+		max1i = -1;
+		max2i = -1;
 		for (matrix<int>::const_iterator2 it2 = it1.begin(); it2!=it1.end(); ++it2) {
 			if (*it2 > max1) {
 				max2 = max1;
@@ -118,19 +149,23 @@ matrix<int> Hazard::InitMPtrs(matrix<int> &M) {
 void Hazard::Update(matrix<int> M) {
 	static const scalar_matrix<FLOATT> summer (scalar_matrix<FLOATT> (1, H.size1(), 1));
 
-	int * Mh, * Md;
-	FLOATT * cd;
-	rl_pointer * HFuncd;
-	FLOATT * Hd;
-
-	const int sizemd = MPtrs.size1() * 2 * sizeof(int);
-	const int sizec = c.size1() * sizeof(FLOATT);
-	const int sizehfunc = HFunc.size1() * sizeof(rl_pointer);
-	const int sizeh = H.size1() * sizeof(FLOATT);
+//	int * Mh, * Md;
+//	FLOATT * cd;
+//	rl_pointer * HFuncd;
+//	FLOATT * Hd;
+//
+//	const int sizemd = MPtrs.size1() * 2 * sizeof(int);
+//	const int sizec = c.size1() * sizeof(FLOATT);
+//	const int sizehfunc = HFunc.size1() * sizeof(rl_pointer);
+//	const int sizeh = H.size1() * sizeof(FLOATT);
 
 	//std::cout << sizemd << '\t' << MPtrs.size1() << '\t' << sizeof(int) << '\t' << std::endl;
 
-	Mh = (int*)malloc(sizemd);
+	#if PROFILE
+	PROF_BEGIN(PROF_INIT_MARKING);
+	#endif
+
+//	Mh = (int*)malloc(sizemd);
 	for (int i = 0; i < MPtrs.size1(); ++i) {
 		//std::cout << "reaction " << i << " mval/pointers: ";
 		for (int j = 0; j < 2; ++j) {
@@ -146,29 +181,66 @@ void Hazard::Update(matrix<int> M) {
 		//std::cout << std::endl;
 	}
 
+	#if PROFILE
+	PROF_END(PROF_INIT_MARKING);
+	#endif
 	//for (int i = 0; i < MPtrs.size1(); ++i) {
 		//std::cout << Mh[i*2 + 0] << ' ' << Mh[i*2 + 1] << std::endl;
 	//}
 
-	cudaMalloc((void**) &Md, sizemd);
+	#if PROFILE
+	PROF_BEGIN(PROF_CUDAMALLOC);
+	#endif
+
+//	cudaMalloc((void**) &Md, sizemd);
+//	cudaMalloc((void**) &cd, sizec);
+//	cudaMalloc((void**) &HFuncd, sizehfunc);
+//
+//	cudaMalloc((void**) &Hd, sizeh);
+
+	#if PROFILE
+	PROF_END(PROF_CUDAMALLOC);
+	#endif
+
+	#if PROFILE
+	PROF_BEGIN(PROF_CUDAMEMCOPY_TO);
+	#endif
+
 	cudaMemcpy(Md, Mh, sizemd, cudaMemcpyHostToDevice);
-	cudaMalloc((void**) &cd, sizec);
 	cudaMemcpy(cd, &(c.data()[0]), sizec, cudaMemcpyHostToDevice);
-	cudaMalloc((void**) &HFuncd, sizehfunc);
 	cudaMemcpy(HFuncd, &(HFunc.data()[0]), sizehfunc, cudaMemcpyHostToDevice);
 
-	cudaMalloc((void**) &Hd, sizeh);
+	#if PROFILE
+	PROF_END(PROF_CUDAMEMCOPY_TO);
+	#endif
 
 	dim3 dimBlock(1024, 1, 1);
-	dim3 dimGrid(H.size1() +1, 1, 1);
+	dim3 dimGrid(H.size1()/1024 + 1, 1, 1);
+
+	#if PROFILE
+	PROF_BEGIN(PROF_UPDATE_KERNEL);
+	#endif
 
 	UpdateKernel<<<dimGrid, dimBlock>>>(Md, cd, HFuncd, Hd, H.size1());
+	cudaDeviceSynchronize();
+
+	#if PROFILE
+	PROF_END(PROF_UPDATE_KERNEL);
+	#endif
+
+	#if PROFILE
+	PROF_BEGIN(PROF_CUDAMEMCOPY_FROM);
+	#endif
 
 	cudaMemcpy(&(H.data()[0]), Hd, sizeh, cudaMemcpyDeviceToHost);
 
+	#if PROFILE
+	PROF_END(PROF_CUDAMEMCOPY_FROM);
+	#endif
+
 	//std::cout << std::endl << "hazard: " << H << std::endl;
-	cudaFree(Md); cudaFree(cd); cudaFree(HFuncd); cudaFree(Hd);
-	free(Mh);
+//	cudaFree(Md); cudaFree(cd); cudaFree(HFuncd); cudaFree(Hd);
+//	free(Mh);
 
 	H0 = prod(summer, H)(0,0);
 	//std::cout << "H0 is: " << H0 << std::endl;

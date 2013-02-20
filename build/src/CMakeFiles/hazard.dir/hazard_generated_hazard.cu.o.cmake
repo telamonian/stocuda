@@ -77,7 +77,7 @@ set(CUDA_NVCC_FLAGS_DEBUG  ; )
 set(CUDA_NVCC_FLAGS_MINSIZEREL  ; )
 set(CUDA_NVCC_FLAGS_RELEASE  ; )
 set(CUDA_NVCC_FLAGS_RELWITHDEBINFO  ; )
-set(nvcc_flags -m64) # list
+set(nvcc_flags -m64;-DPROF_ENABLE) # list
 set(CUDA_NVCC_INCLUDE_ARGS "-I/Developer/NVIDIA/CUDA-5.0/include;-I/usr/local/include;-I/Library/Frameworks/Python.framework/Headers;-I/Library/Python/2.7/site-packages/numpy-1.8.0.dev_5c944b9_20120828-py2.7-macosx-10.8-x86_64.egg/numpy/core/include;-I/Users/tel/git/stocuda/src/.;-I/Developer/NVIDIA/CUDA-5.0/include") # list (needs to be in quotes to handle spaces properly).
 set(format_flag "-c") # string
 
