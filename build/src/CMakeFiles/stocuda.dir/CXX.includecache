@@ -448,24 +448,6 @@ time.h
 
 /Users/tel/git/stocuda/src/ProfileCodes.h
 
-/Users/tel/git/stocuda/src/hazard.cc
-pyublas/numpy.hpp
--
-boost/numeric/ublas/matrix.hpp
--
-boost/numeric/ublas/io.hpp
--
-iostream
--
-cmath
--
-hazard.hh
-/Users/tel/git/stocuda/src/hazard.hh
-Profile.h
-/Users/tel/git/stocuda/src/Profile.h
-ProfileCodes.h
-/Users/tel/git/stocuda/src/ProfileCodes.h
-
 /Users/tel/git/stocuda/src/hazard.hh
 cuda.h
 -
@@ -519,16 +501,6 @@ string
 -
 hazard.hh
 /Users/tel/git/stocuda/src/hazard.hh
-
-/Users/tel/git/stocuda/src/stocuda.cc
-pyublas/numpy.hpp
--
-pnet.hh
-/Users/tel/git/stocuda/src/pnet.hh
-Profile.h
-/Users/tel/git/stocuda/src/Profile.h
-ProfileCodes.h
-/Users/tel/git/stocuda/src/ProfileCodes.h
 
 /usr/local/include/boost/algorithm/string/config.hpp
 boost/config.hpp

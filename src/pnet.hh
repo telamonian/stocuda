@@ -5,7 +5,7 @@
  *      Author: tel
  */
 #define FLOATT float
-#define PROFILE 1
+#define PROFILE 0
 
 #ifndef PNET_HH_
 #define PNET_HH_

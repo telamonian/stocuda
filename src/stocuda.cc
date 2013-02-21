@@ -1,5 +1,5 @@
 #define FLOATT float
-#define PROFILE 1
+#define PROFILE 0
 
 #include <pyublas/numpy.hpp>
 #include "pnet.hh"

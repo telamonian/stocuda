@@ -5,7 +5,7 @@
  *      Author: tel
  */
 #define FLOATT float
-#define PROFILE 1
+#define PROFILE 0
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
@@ -17,6 +17,7 @@
 #if PROFILE
 #include "Profile.h"
 #include "ProfileCodes.h"
+PROF_ALLOC;
 #endif
 
 using namespace boost::numeric::ublas;
@@ -43,9 +44,14 @@ void Pnet::Gillespie(int n) {
 			tsum += H.H(j,0);
 		}
 		//std::cout << "reaction #" << j << " fired" << std::endl;
+		#if PROFILE
 		PROF_BEGIN(PROF_UPDATEM);
+		#endif
+
 		UpdateM(j);
+		#if PROFILE
 		PROF_END(PROF_UPDATEM);
+		#endif
 		//for (int k = 0; k < M.size1(); ++k)
 		    //std::cout << &(M.data()[0]) + k << '\t' << *(&(M.data()[0]) + k) << '\t' ;
 		//std::cout << std::endl;

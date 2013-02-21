@@ -1,4 +1,5 @@
-#define PROFILE 1
+#define PROFILE 0
+#define BLOCKSIZE 1024
 #define FLOATT float
 
 #include <cuda.h>
@@ -20,30 +21,30 @@ using namespace boost::numeric::ublas;
 
 __device__ int counter = 0;
 
-__global__ void UpdateKernel(int * Md, int ** MdPtrs, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width);
-__global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, const int width);
+__global__ void UpdateKernel(int * Md, int ** MdPtrs, FLOATT * cd, rl_pointer * HFuncd, FLOATT * Hd, int width);
+__global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, int width);
 __device__ FLOATT rl_00(FLOATT c, int * M1, int * M2);
 __device__ FLOATT rl_10(FLOATT c, int * M1, int * M2);
 __device__ FLOATT rl_11(FLOATT c, int * M1, int * M2);
 __device__ FLOATT rl_20(FLOATT c, int * M1, int * M2);
 
 __device__ FLOATT rl_00(FLOATT c, int * M1, int * M2) {
-	printf("rl_00");
+	//printf("rl_00\n");
 	return c;
 }
 
 __device__ FLOATT rl_10(FLOATT c, int * M1, int * M2) {
-	printf("rl_10 %d\n", *M1);
+	//printf("rl_10 %d\n", *M1);
 	return c*(*M1);
 }
 
 __device__ FLOATT rl_11(FLOATT c, int * M1, int * M2) {
-    printf("rl_11 %d\t%d\n", *M1, *M2);
+    //printf("rl_11 %d\t%d\n", *M1, *M2);
 	return c*(*M1)*(*M2);
 }
 
 __device__ FLOATT rl_20(FLOATT c, int * M1, int * M2) {
-	printf("rl_20 %d\n", *M1);
+	//printf("rl_20 %d\n", *M1);
 	return (c/2)*(*M1)*((*M1)-1);
 }
 
@@ -147,33 +148,37 @@ void Hazard::InitGlobal(matrix<int> &M) {
 	cudaMalloc((void**) &Hd, sizeh);
 
 	cudaMemcpy(Md, &(M.data()[0]), sizemd, cudaMemcpyHostToDevice);
-	cudaMemcpy(cd, &(c.data()[0]), sizec, cudaMemcpyHostToDevice);
-	cudaMemcpy(HFuncd, &(HFunc.data()[0]), sizehfunc, cudaMemcpyHostToDevice);
+
+//	for (int i = 0;i < 46;++i) {
+//		printf("HFunc pointer for reaction %d: %0x\n", i, HFunc(i,0));
+//	}
+
 
 	int * MdIndex;
 	cudaMalloc((void**) &MdIndex, sizemptrs);
 	cudaMemcpy(MdIndex, &(MPtrs.data()[0]), sizemptrs, cudaMemcpyHostToDevice);
+//	std::cout << "MPtrs: " << MPtrs << std::endl;
 
-	dim3 dimBlock(1024, 1, 1);
-	dim3 dimGrid(c.size1()/1024 + 1, 1, 1);
-	InitMdPtrs<<<dimGrid, dimBlock>>>(Md, MdIndex, MdPtrs, sizemdptrs);
+	dim3 dimBlock(BLOCKSIZE, 1, 1);
+	dim3 dimGrid((c.size1()*2)/BLOCKSIZE + 1, 1, 1);
+	InitMdPtrs<<<dimGrid, dimBlock>>>(Md, MdIndex, MdPtrs, c.size1()*2);
 	//cudaDeviceSynchronize();
 
-	printf("%d\n", Md);
 	cudaFree(MdIndex);
+	cudaMemcpy(cd, &(c.data()[0]), sizec, cudaMemcpyHostToDevice);
+	cudaMemcpy(HFuncd, &(HFunc.data()[0]), sizehfunc, cudaMemcpyHostToDevice);
 }
 
-__global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, const int width) {
+__global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, int width) {
 	int tx = threadIdx.x + (blockDim.x*blockIdx.x);
 	//for (int i=0;i<16;++i) {
 		//printf("%d\n", Md[i]);
 	//}
 	//printf("%d %d\n", Md, MdPtrs);
 	if (tx < width) {
-		if (MdIndex[tx] > 0) {
-			MdPtrs[tx] = Md + MdIndex[tx];
-			//printf("%d\n", *MdPtrs[tx]);
-			//printf("%d\n", &(Md[0]) + MdIndex[tx]);
+		if (MdIndex[tx] >= 0) {
+			MdPtrs[tx] = &(Md[MdIndex[tx]]);
+//			printf("device species pointer %d: %ld\n", tx, (long long)(&(Md[MdIndex[tx]])));
 		}
 		else {
 			MdPtrs[tx] = NULL;
@@ -203,21 +208,23 @@ void Hazard::Update(matrix<int> &M) {
 	#endif
 
 	cudaMemcpy(Md, &(M.data()[0]), sizemd, cudaMemcpyHostToDevice);
+//	cudaMemcpy(cd, &(c.data()[0]), sizec, cudaMemcpyHostToDevice);
+//	cudaMemcpy(HFuncd, &(HFunc.data()[0]), sizehfunc, cudaMemcpyHostToDevice);
 
 	#if PROFILE
 	PROF_END(PROF_CUDAMEMCOPY_TO);
 	#endif
 
-	dim3 dimBlock(32, 1, 1);
-	dim3 dimGrid(H.size1()/32 + 1, 1, 1);
+	dim3 dimBlock(BLOCKSIZE, 1, 1);
+	dim3 dimGrid(H.size1()/BLOCKSIZE + 1, 1, 1);
 
 	#if PROFILE
 	PROF_BEGIN(PROF_UPDATE_KERNEL);
 	#endif
 
 	UpdateKernel<<<dimGrid, dimBlock>>>(Md, MdPtrs, cd, HFuncd, Hd, H.size1());
-	//cudaDeviceSynchronize();
-	usleep(2000000);
+	cudaDeviceSynchronize();
+
 	#if PROFILE
 	PROF_END(PROF_UPDATE_KERNEL);
 	#endif
@@ -232,16 +239,19 @@ void Hazard::Update(matrix<int> &M) {
 	PROF_END(PROF_CUDAMEMCOPY_FROM);
 	#endif
 
-	std::cout << std::endl << "hazard: " << H << std::endl;
+//	std::cout << std::endl << "hazard: " << H << std::endl;
 //	cudaFree(Md); cudaFree(cd); cudaFree(HFuncd); cudaFree(Hd);
 //	free(Mh);
 
 	H0 = prod(summer, H)(0,0);
-	std::cout << "H0 is: " << H0 << std::endl;
+//	std::cout << "H0 is: " << H0 << std::endl;
 }
 
-__global__ void UpdateKernel(int * Md, int ** MdPtrs, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width) {
+__global__ void UpdateKernel(int * Md, int ** MdPtrs, FLOATT * cd, rl_pointer * HFuncd, FLOATT * Hd, int width) {
 	int tx = threadIdx.x + (blockDim.x*blockIdx.x);
+//	int a=1, b=1;
+//	int * pa = &a, * pb = &b;
+
 	//printf("pointer to Md and MdPtrs cast as longs: %0x %0x\n", icMd, icMdPtrs);
 	//printf("pointer to Md and MdPtrs cast as longs cast as pointers: %0x %0x\n", (int*)icMd, (int**)icMdPtrs);
 //	int * Md;
@@ -258,22 +268,47 @@ __global__ void UpdateKernel(int * Md, int ** MdPtrs, const FLOATT * cd, const r
 	//++counter;
 	//printf("Thread %d width: %d\n", tx, width);
 	//printf("Thread %d md mdptrs pointer: %0x %0x\n", tx, Md, MdPtrs);
+//	if (tx < 1) {
+//		printf("size of int: %d\n", sizeof(int));
+//		for (int i = 0; i < 32; ++i) {
+//			printf ("species %d marking: %d\n", i, Md[i]);
+//		}
+//		for (int i = 0; i < 46; ++i) {
+//					printf ("reaction %d constant: %.3f\n", i, cd[i]);
+//		}
+//	}
 	if (tx < width) {
-		if (MdPtrs[tx*2] != NULL && MdPtrs[tx*2 + 1] != NULL) {
-			printf("Thread %d m values: %d %d\n", tx,*(MdPtrs[tx*2]), *(MdPtrs[tx*2 + 1]));
-		}
-		else if (MdPtrs[tx*2] != NULL) {
-			printf("Thread %d m values: %d NULL\n", tx,*(MdPtrs[tx*2]));
-		}
-		else {
-					printf("Thread %d m values: NULL NULL\n", tx);
-		}
-		//printf("%d\t%.3f\t%ld\t%ld\t%ld\t%ld\t%ld\n", tx, cd[tx], (long long)HFuncd[tx], (long long)prl_00, (long long)prl_10, (long long)prl_20, (long long)prl_11);
+//		if (HFuncd[tx]==prl_11) {
+//			if (MdPtrs[tx*2] != NULL && MdPtrs[tx*2 + 1] != NULL) {
+//				printf("Thread %d m values: %d %d\n", tx,*(MdPtrs[tx*2]), *(MdPtrs[tx*2 + 1]));
+//				a = *(MdPtrs[tx*2]);
+//				b = *(MdPtrs[tx*2+1]);
+//				pa = &a;
+//				pb = &b;
+//			}
+//			else if (MdPtrs[tx*2] != NULL) {
+//				printf("Thread %d m values: %d NULL\n", tx,*(MdPtrs[tx*2]));
+//				a = *(MdPtrs[tx*2]);
+//				b = 10101010;
+//				pa = &a;
+//				pb = &b;
+//			}
+//			else {
+//				printf("Thread %d m values: NULL NULL\n", tx);
+//				a = 10101010;
+//				b = 10101010;
+//				pa = &a;
+//				pb = &b;
+//			}
+//		}
+		//printf("%.3f %.3f\t", Hd[tx], HFuncd[tx](cd[tx], MdPtrs[tx*2], MdPtrs[tx*2+1]));
+		//printf("%d\t%.3f\t%0x\t%ld\t%ld\t%ld\t%ld\n", tx, cd[tx], (long long)HFuncd[tx], (long long)prl_00, (long long)prl_10, (long long)prl_20, (long long)prl_11);
 		//printf("%.8f %d %d\t", cd[tx], Md[tx*2], Md[tx*2+1]);
 		//printf("%d %d\t", Md[tx*2], Md[tx*2+1]);
 		//printf("%.3f ", HFuncd[tx](cd[tx], Md[tx*2], Md[tx*2+1]));
-		//printf("%.3f ", Hd[tx]);
-		Hd[tx] = HFuncd[tx](cd[tx], *(MdPtrs + tx*2), *(MdPtrs + tx*2+1));
-		//printf("%.3f %.3f\t", Hd[tx], HFuncd[tx](cd[tx], Md[tx*2], Md[tx*2+1]));
+		//printf("thread %d hfunc pointer: %0x\n ", tx, Hd[tx]);
+		//Hd[tx] = 1;
+		Hd[tx] = HFuncd[tx](cd[tx], MdPtrs[tx*2], MdPtrs[tx*2 + 1]);
+		//Hd[tx] = HFuncd[tx](.1, pa, pb);
 	}
 }
