@@ -9,24 +9,16 @@
 #if PROFILE
 #include "Profile.h"
 #include "ProfileCodes.h"
+PROF_ALLOC;
 #endif
 
-PROF_ALLOC;
+
 
 using namespace boost::numeric::ublas;
 
-typedef FLOATT (*rl_pointer)(FLOATT, int *, int *);
+//typedef FLOATT (*rl_pointer)(FLOATT, int *, int *);
 
-__device__ int * Md;
-__device__ int ** MdPtrs;
-__device__ FLOATT * cd;
-__device__ rl_pointer * HFuncd;
-__device__ FLOATT * Hd;
-
-int sizemd;
-int sizec;
-int sizehfunc;
-int sizeh;
+__device__ int counter = 0;
 
 __global__ void UpdateKernel(int * Md, int ** MdPtrs, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width);
 __global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, const int width);
@@ -36,22 +28,22 @@ __device__ FLOATT rl_11(FLOATT c, int * M1, int * M2);
 __device__ FLOATT rl_20(FLOATT c, int * M1, int * M2);
 
 __device__ FLOATT rl_00(FLOATT c, int * M1, int * M2) {
-    //std::cout << "rl_00" << std::endl;
+	printf("rl_00");
 	return c;
 }
 
 __device__ FLOATT rl_10(FLOATT c, int * M1, int * M2) {
-	//std::cout << "rl_10" << '\t' << M1 << std::endl;
+	printf("rl_10 %d\n", *M1);
 	return c*(*M1);
 }
 
 __device__ FLOATT rl_11(FLOATT c, int * M1, int * M2) {
-    //std::cout << "rl_11" << '\t' << M1 << '\t' << M2 << std::endl;
+    printf("rl_11 %d\t%d\n", *M1, *M2);
 	return c*(*M1)*(*M2);
 }
 
 __device__ FLOATT rl_20(FLOATT c, int * M1, int * M2) {
-    //std::cout << "rl_20" << '\t' << M1 << std::endl;
+	printf("rl_20 %d\n", *M1);
 	return (c/2)*(*M1)*((*M1)-1);
 }
 
@@ -135,10 +127,15 @@ matrix<int> Hazard::InitMPtrs(matrix<int> &M) {
 	return mptrs;
 }
 
-void Hazard::InitGlobal() {
+void Hazard::InitGlobal(matrix<int> &M) {
+	int sizemd;
+	int sizec;
+	int sizehfunc;
+	int sizeh;
+
 	int sizemptrs = c.size1() * 2 * sizeof(int);
 	int sizemdptrs = c.size1() * 2 * sizeof(int*);
-	sizemd = Pre.size2() * sizeof(int);
+	sizemd = M.size1() * sizeof(int);
 	sizec = c.size1() * sizeof(FLOATT);
 	sizehfunc = HFunc.size1() * sizeof(rl_pointer);
 	sizeh = H.size1() * sizeof(FLOATT);
@@ -149,6 +146,7 @@ void Hazard::InitGlobal() {
 	cudaMalloc((void**) &HFuncd, sizehfunc);
 	cudaMalloc((void**) &Hd, sizeh);
 
+	cudaMemcpy(Md, &(M.data()[0]), sizemd, cudaMemcpyHostToDevice);
 	cudaMemcpy(cd, &(c.data()[0]), sizec, cudaMemcpyHostToDevice);
 	cudaMemcpy(HFuncd, &(HFunc.data()[0]), sizehfunc, cudaMemcpyHostToDevice);
 
@@ -156,79 +154,49 @@ void Hazard::InitGlobal() {
 	cudaMalloc((void**) &MdIndex, sizemptrs);
 	cudaMemcpy(MdIndex, &(MPtrs.data()[0]), sizemptrs, cudaMemcpyHostToDevice);
 
-	dim3 dimBlock(32, 1, 1);
-	dim3 dimGrid(H.size1()/32 + 1, 1, 1);
+	dim3 dimBlock(1024, 1, 1);
+	dim3 dimGrid(c.size1()/1024 + 1, 1, 1);
 	InitMdPtrs<<<dimGrid, dimBlock>>>(Md, MdIndex, MdPtrs, sizemdptrs);
-	cudaDeviceSynchronize();
+	//cudaDeviceSynchronize();
 
+	printf("%d\n", Md);
 	cudaFree(MdIndex);
 }
 
 __global__ void InitMdPtrs(int * Md, int * MdIndex, int ** MdPtrs, const int width) {
 	int tx = threadIdx.x + (blockDim.x*blockIdx.x);
-
+	//for (int i=0;i<16;++i) {
+		//printf("%d\n", Md[i]);
+	//}
+	//printf("%d %d\n", Md, MdPtrs);
 	if (tx < width) {
-		MdPtrs[tx] = Md + MdIndex[tx];
+		if (MdIndex[tx] > 0) {
+			MdPtrs[tx] = Md + MdIndex[tx];
+			//printf("%d\n", *MdPtrs[tx]);
+			//printf("%d\n", &(Md[0]) + MdIndex[tx]);
+		}
+		else {
+			MdPtrs[tx] = NULL;
+		}
 	}
 }
 
 
 
-void Hazard::Update(matrix<int> M) {
+void Hazard::Update(matrix<int> &M) {
 	static const scalar_matrix<FLOATT> summer (scalar_matrix<FLOATT> (1, H.size1(), 1));
 
-//	int * Mh, * Md;
-//	FLOATT * cd;
-//	rl_pointer * HFuncd;
-//	FLOATT * Hd;
-//
-//	const int sizemd = MPtrs.size1() * 2 * sizeof(int);
-//	const int sizec = c.size1() * sizeof(FLOATT);
-//	const int sizehfunc = HFunc.size1() * sizeof(rl_pointer);
-//	const int sizeh = H.size1() * sizeof(FLOATT);
+	int sizemd;
+	int sizec;
+	int sizehfunc;
+	int sizeh;
 
-	//std::cout << sizemd << '\t' << MPtrs.size1() << '\t' << sizeof(int) << '\t' << std::endl;
-
-	#if PROFILE
-	PROF_BEGIN(PROF_INIT_MARKING);
-	#endif
-
-//	Mh = (int*)malloc(sizemd);
-	for (int i = 0; i < MPtrs.size1(); ++i) {
-		//std::cout << "reaction " << i << " mval/pointers: ";
-		for (int j = 0; j < 2; ++j) {
-			if (MPtrs(i,j) != -1) {
-				//std::cout << MPtrs(i,j) << ' ' << *MPtrs(i,j) << ' ';
-				Mh[i*2 + j] = M(MPtrs(i,j), 0);
-			}
-			else {
-				Mh[i*2 + j] = 0;
-				//std::cout << MPtrs(i,j) << " NULL";
-			}
-		}
-		//std::cout << std::endl;
-	}
-
-	#if PROFILE
-	PROF_END(PROF_INIT_MARKING);
-	#endif
-	//for (int i = 0; i < MPtrs.size1(); ++i) {
-		//std::cout << Mh[i*2 + 0] << ' ' << Mh[i*2 + 1] << std::endl;
-	//}
-
-	#if PROFILE
-	PROF_BEGIN(PROF_CUDAMALLOC);
-	#endif
-
-//	cudaMalloc((void**) &Md, sizemd);
-//	cudaMalloc((void**) &cd, sizec);
-//	cudaMalloc((void**) &HFuncd, sizehfunc);
-//
-//	cudaMalloc((void**) &Hd, sizeh);
-
-	#if PROFILE
-	PROF_END(PROF_CUDAMALLOC);
-	#endif
+	int sizemptrs = c.size1() * 2 * sizeof(int);
+	int sizemdptrs = c.size1() * 2 * sizeof(int*);
+	sizemd = M.size1() * sizeof(int);
+	sizec = c.size1() * sizeof(FLOATT);
+	sizehfunc = HFunc.size1() * sizeof(rl_pointer);
+	sizeh = H.size1() * sizeof(FLOATT);
 
 	#if PROFILE
 	PROF_BEGIN(PROF_CUDAMEMCOPY_TO);
@@ -248,8 +216,8 @@ void Hazard::Update(matrix<int> M) {
 	#endif
 
 	UpdateKernel<<<dimGrid, dimBlock>>>(Md, MdPtrs, cd, HFuncd, Hd, H.size1());
-	cudaDeviceSynchronize();
-
+	//cudaDeviceSynchronize();
+	usleep(2000000);
 	#if PROFILE
 	PROF_END(PROF_UPDATE_KERNEL);
 	#endif
@@ -264,26 +232,48 @@ void Hazard::Update(matrix<int> M) {
 	PROF_END(PROF_CUDAMEMCOPY_FROM);
 	#endif
 
-	//std::cout << std::endl << "hazard: " << H << std::endl;
+	std::cout << std::endl << "hazard: " << H << std::endl;
 //	cudaFree(Md); cudaFree(cd); cudaFree(HFuncd); cudaFree(Hd);
 //	free(Mh);
 
 	H0 = prod(summer, H)(0,0);
-	//std::cout << "H0 is: " << H0 << std::endl;
+	std::cout << "H0 is: " << H0 << std::endl;
 }
 
 __global__ void UpdateKernel(int * Md, int ** MdPtrs, const FLOATT * cd, const rl_pointer * HFuncd, FLOATT * Hd, const int width) {
 	int tx = threadIdx.x + (blockDim.x*blockIdx.x);
+	//printf("pointer to Md and MdPtrs cast as longs: %0x %0x\n", icMd, icMdPtrs);
+	//printf("pointer to Md and MdPtrs cast as longs cast as pointers: %0x %0x\n", (int*)icMd, (int**)icMdPtrs);
+//	int * Md;
+//	int ** MdPtrs;
+//	long recastMd;
+//	long recastMdPtrs;
+//	recastMd = (long)(int*)icMd;
+//	recastMdPtrs = (long)(int**)icMdPtrs;
+//	Md = (int*)icMd;
+//	MdPtrs = (int**)icMdPtrs;
 
-
+	//printf("pointer to Md and MdPtrs cast as longs cast as pointers cast as longs: %0x %0x\n", recastMd, recastMdPtrs);
+	//printf("counter: %d", counter);
+	//++counter;
+	//printf("Thread %d width: %d\n", tx, width);
+	//printf("Thread %d md mdptrs pointer: %0x %0x\n", tx, Md, MdPtrs);
 	if (tx < width) {
-		//printf("Thread %d mvalues: %d %d\n", tx, Md[tx*2], Md[tx*2+1]);
-		//printf("%d\t%.3f\t%ld\t%.3f\t%ld\t%ld\t%ld\t%ld\n", tx, cd[tx], (long long)HFuncd[tx], HFuncd[tx](5, 5, 5), (long long)prl_00, (long long)prl_10, (long long)prl_20, (long long)prl_11);
+		if (MdPtrs[tx*2] != NULL && MdPtrs[tx*2 + 1] != NULL) {
+			printf("Thread %d m values: %d %d\n", tx,*(MdPtrs[tx*2]), *(MdPtrs[tx*2 + 1]));
+		}
+		else if (MdPtrs[tx*2] != NULL) {
+			printf("Thread %d m values: %d NULL\n", tx,*(MdPtrs[tx*2]));
+		}
+		else {
+					printf("Thread %d m values: NULL NULL\n", tx);
+		}
+		//printf("%d\t%.3f\t%ld\t%ld\t%ld\t%ld\t%ld\n", tx, cd[tx], (long long)HFuncd[tx], (long long)prl_00, (long long)prl_10, (long long)prl_20, (long long)prl_11);
 		//printf("%.8f %d %d\t", cd[tx], Md[tx*2], Md[tx*2+1]);
 		//printf("%d %d\t", Md[tx*2], Md[tx*2+1]);
 		//printf("%.3f ", HFuncd[tx](cd[tx], Md[tx*2], Md[tx*2+1]));
 		//printf("%.3f ", Hd[tx]);
-		Hd[tx] = HFuncd[tx](cd[tx], MdPtrs[tx*2], MdPtrs[tx*2+1]);
+		Hd[tx] = HFuncd[tx](cd[tx], *(MdPtrs + tx*2), *(MdPtrs + tx*2+1));
 		//printf("%.3f %.3f\t", Hd[tx], HFuncd[tx](cd[tx], Md[tx*2], Md[tx*2+1]));
 	}
 }

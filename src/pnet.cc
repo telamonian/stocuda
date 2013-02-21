@@ -29,8 +29,10 @@ void Pnet::Gillespie(int n) {
 	PROF_INIT;
 	#endif
 
+	int c = 0;
 	int j;
 	for (int i = 0; i < n; ++i) {
+		++c;
 		t = t + dt(mtgen);
 		chance = uni(mtgen)*H.H0;
 		j = 0;
@@ -51,7 +53,7 @@ void Pnet::Gillespie(int n) {
 		/// prep random number generators for next round
 		dt.param(H.H0);
 	}
-	std::cout << t << '\t' << M << std::endl;
+	std::cout << c << '\t' << t << '\t' << M << std::endl;
 
 	#if PROFILE
 	PROF_WRITE;

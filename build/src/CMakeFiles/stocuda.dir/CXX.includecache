@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/Developer/NVIDIA/CUDA-5.0/include/cuda.h
+stdlib.h
+-
+
 /Library/Frameworks/Python.framework/Headers/Python.h
 patchlevel.h
 /Library/Frameworks/Python.framework/Headers/patchlevel.h
@@ -463,6 +467,8 @@ ProfileCodes.h
 /Users/tel/git/stocuda/src/ProfileCodes.h
 
 /Users/tel/git/stocuda/src/hazard.hh
+cuda.h
+-
 pyublas/numpy.hpp
 -
 boost/numeric/ublas/matrix.hpp

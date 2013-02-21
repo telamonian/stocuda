@@ -9,13 +9,15 @@
 #define HAZARD_HH_
 #define FLOATT float
 
-
+#include <cuda.h>
 #include <pyublas/numpy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
 using namespace pyublas;
 using namespace boost::numeric::ublas;
+
+typedef FLOATT (*rl_pointer)(FLOATT, int *, int *);
 
 class Hazard {
 
@@ -54,7 +56,7 @@ public:
 		S(InitS()),
 		MPtrs(InitMPtrs(Mi)),
 		HFunc(InitHFunc()) {
-		InitGlobal();
+		InitGlobal(Mi);
 		Update(Mi);
 	}
 
@@ -70,11 +72,16 @@ public:
 	matrix<int> InitMPtrs(matrix<int> &M);
 	matrix<rl_pointer> HFunc;
 	matrix<rl_pointer> InitHFunc();
+	int * Md;
+	int ** MdPtrs;
+	FLOATT * cd;
+	rl_pointer * HFuncd;
+	FLOATT * Hd;
 
 	//void Update();
-	void Update(matrix<int> M);
+	void Update(matrix<int> &M);
 
-	void InitGlobal();
+	void InitGlobal(matrix<int> &M);
 
 	matrix<FLOATT> InitS() {
 		return trans(Post-Pre);

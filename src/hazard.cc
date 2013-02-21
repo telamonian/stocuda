@@ -22,7 +22,7 @@
 using namespace pyublas;
 using namespace boost::numeric::ublas;
 
-typedef FLOATT (*rl_pointer)(FLOATT, int , int );
+//typedef FLOATT (*rl_pointer)(FLOATT, int , int );
 typedef matrix<int>::iterator1 i1_t;
 typedef matrix<int>::iterator2 i2_t;
 
