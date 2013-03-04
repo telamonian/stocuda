@@ -53,8 +53,8 @@ matrix<int> Hazard::InitOrder() {
 	for (matrix<int>::const_iterator1 it1 = Pre.begin1(); it1!=Pre.end1(); ++it1) {
 		max1 = 0;
 		max2 = 0;
-		max1i = NULL;
-		max2i = NULL;
+		max1i = 0;
+		max2i = 0;
 		for (matrix<int>::const_iterator2 it2 = it1.begin(); it2!=it1.end(); ++it2) {
 			if (*it2 > max1) {
 				max2 = max1;
