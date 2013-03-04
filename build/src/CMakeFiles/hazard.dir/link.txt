@@ -1,2 +1,0 @@
-/usr/bin/ar cr libhazard.a  CMakeFiles/hazard.dir/./hazard_generated_hazard.cu.o
-/usr/bin/ranlib libhazard.a
