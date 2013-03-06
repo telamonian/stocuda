@@ -91,8 +91,8 @@ public:
 		c(ci),
 		t(0),
 		A(InitA()),
-		H(Hazard(Pre, Post, M, c)),
 		S(InitS()),
+		H(Hazard(Pre, Post, M, c)),
 		mtgen(time(NULL)),
 		dt(H.H0),
 		uni(0, 1) {}

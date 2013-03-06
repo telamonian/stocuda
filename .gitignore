@@ -1,5 +1,12 @@
-build
+build/*
+!build/src
+!build/__init__.py
+
+build/src/*
+!build/src/__init__.py
+
 eprof
 .settings
 .project
 .cproject
+.pydevproject

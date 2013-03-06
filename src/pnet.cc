@@ -56,6 +56,10 @@ void Pnet::Gillespie(int n) {
 		    //std::cout << &(M.data()[0]) + k << '\t' << *(&(M.data()[0]) + k) << '\t' ;
 		//std::cout << std::endl;
 
+		if (i%50==0) {
+			std::cout << c << '\t' << t << '\t' << M << std::endl;
+		}
+
 		/// prep random number generators for next round
 		dt.param(H.H0);
 	}
