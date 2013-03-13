@@ -10,3 +10,4 @@ eprof
 .project
 .cproject
 .pydevproject
+*.out
