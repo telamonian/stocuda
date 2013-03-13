@@ -32,13 +32,14 @@ void Pnet::Gillespie(int n) {
 
 	int c = 0;
 	int j;
+	float report_time = 0;
 	for (int i = 0; i < n; ++i) {
 		++c;
 		t = t + dt(mtgen);
 		chance = uni(mtgen)*H.H0;
 		j = 0;
 		tsum  = H.H(j,0);
-		//std::cout << H->H << '\t' << H->H0 << std::endl;
+		//std::cout << H.H << '\t' << H.H0 << std::endl;
 		while (tsum < chance) {
 			++j;
 			tsum += H.H(j,0);
@@ -56,8 +57,9 @@ void Pnet::Gillespie(int n) {
 		    //std::cout << &(M.data()[0]) + k << '\t' << *(&(M.data()[0]) + k) << '\t' ;
 		//std::cout << std::endl;
 
-		if (i%50==0) {
+		if (t > report_time) {
 			std::cout << c << '\t' << t << '\t' << M << std::endl;
+			report_time += .0001;
 		}
 
 		/// prep random number generators for next round

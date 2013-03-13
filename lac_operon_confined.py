@@ -11,29 +11,35 @@ import pyublas
 #pyublas.set_trace(True)
 np.set_printoptions(precision=10, suppress=True, linewidth=5000, threshold=10**6)
 
-
 #CONSTANTS
 #UNIVERSAL
 LITER_PER_CUBIC_UM = 10.0**(-15.0)
 NA = 6.022 * 10.0**23.0
+PI = 3.1415
 D_OF_LAC = 380.0  #um^2/s
-PARTICLES_PER_CUBIC_MICROMETER_PER_MICROMOLE = 602.2
+LITER_PARTICLES_PER_CUBIC_MICROMETER_PER_MICROMOLE = 602.2
+MOLES_PER_MICROMOLE = 10**(-6)
 
 #MODIFIABLE
 CELL_REGION_RATIO = 10.0
-CELL_NO = 10.0
-MOLS_LAC = 13.0   #uM
-DIFFUSION_BOUNDARY = 10.0   #um
+CELL_NO = 1*10**2
+UMOLS_LAC = 13.0   #uM
+DIFFUSION_BOUNDARY = 10**5 #um
 
 #NOT VERY MODIFIABLE
-REGION_RADIUS = (CELL_NO*CELL_REGION_RATIO)**(1.0/3.0)
-REGION_SURFACE_AREA = 4.0*3.1415*REGION_RADIUS**2.0
-REGION_VOLUME = (4.0/3.0)*3.1415*REGION_RADIUS**3.0
-CELL_VOLUME = (4.0/3.0)*3.1415
-PARTICLES_IN_REGION = PARTICLES_PER_CUBIC_MICROMETER_PER_MICROMOLE * REGION_VOLUME
-PARTICLES_IN_CELL = PARTICLES_PER_CUBIC_MICROMETER_PER_MICROMOLE * CELL_VOLUME
-DIFF_IN_CONSTANT = ((REGION_SURFACE_AREA * D_OF_LAC)/DIFFUSION_BOUNDARY) * MOLS_LAC
-DIFF_OUT_CONSTANT = (REGION_SURFACE_AREA * D_OF_LAC)/DIFFUSION_BOUNDARY * (1.0/(REGION_VOLUME*LITER_PER_CUBIC_UM*NA))
+CELL_VOLUME = .8
+REGION_RADIUS = ((3.0/4.0*PI)*CELL_VOLUME*CELL_NO*CELL_REGION_RATIO)**(1.0/3.0)
+REGION_SURFACE_AREA = 4.0*3.1415*(REGION_RADIUS**2.0)
+REGION_VOLUME = (4.0/3.0)*3.1415*(REGION_RADIUS**3.0)
+PARTICLES_IN_REGION = LITER_PARTICLES_PER_CUBIC_MICROMETER_PER_MICROMOLE * REGION_VOLUME * UMOLS_LAC
+PARTICLES_IN_CELL = LITER_PARTICLES_PER_CUBIC_MICROMETER_PER_MICROMOLE * CELL_VOLUME * UMOLS_LAC
+DIFF_IN_CONSTANT = ((REGION_SURFACE_AREA * D_OF_LAC)/DIFFUSION_BOUNDARY) * PARTICLES_IN_REGION
+DIFF_OUT_CONSTANT = (REGION_SURFACE_AREA * D_OF_LAC)/DIFFUSION_BOUNDARY #* (1.0/(REGION_VOLUME))#*LITER_PER_CUBIC_UM*NA))
+
+print DIFF_IN_CONSTANT
+print DIFF_OUT_CONSTANT
+print PARTICLES_IN_REGION
+#print DIFF_OUT_CONSTANT * PARTICLES_IN_REGION
 
 def MakeMatrices():
     pass
@@ -91,7 +97,9 @@ class Parser(object):
 #                 s = react.getKineticLaw().getFormula()
 #                 j = [p.getName() for p in self.mod.getListOfParameters()].index(s)
 #                 self.c[i,0] = self.mod.getListOfParameters().get(j).getValue()
-    
+            if np.sum(self.Pre[i,:]) > 1:
+                self.c[i,0]/=float(NA*CELL_VOLUME*LITER_PER_CUBIC_UM)
+                
     def PnetArgList(self):
         return (self.Pre, self.Post, self.M, self.c)
     
@@ -108,7 +116,12 @@ class Parser(object):
                 pnetargs[0],pnetargs[1],pnetargs[3] = self.AddGlobalReaction(pnetargs[0],pnetargs[1],pnetargs[3], reactants=addreactants, products=addproducts, constants=addconstants)
             return pnetargs
         else:
-            return self.PnetArgList()
+            if addreactants and addproducts:
+                pnetargs = list(self.PnetArgList())
+                pnetargs[0],pnetargs[1],pnetargs[3] = self.AddGlobalReaction(pnetargs[0],pnetargs[1],pnetargs[3], reactants=addreactants, products=addproducts, constants=addconstants)
+                return pnetargs
+            else:
+                return self.PnetArgList()
     
     def ShareSpecies(self, mat, scale, shared_species):
         eliminate = []
@@ -232,12 +245,15 @@ def debug():
 if __name__=='__main__':
     fpath = sys.argv[1]
     parser = Parser(fpath)
-    args = parser.Replicate(46, (11,), [[11],[]], [[],[11]], [DIFF_OUT_CONSTANT,DIFF_IN_CONSTANT])
-    args[2][10:12,:] = np.array([[PARTICLES_IN_CELL],[PARTICLES_IN_REGION]])
-    for arg in args:
-        print arg.dtype
+    parser.M[10:12,:] = np.array([[PARTICLES_IN_CELL],[PARTICLES_IN_REGION]])
+    args = parser.Replicate(23*CELL_NO, shared_species=(11,), addreactants=[[11],[]], addproducts=[[],[11]], addconstants=()[DIFF_OUT_CONSTANT,DIFF_IN_CONSTANT])
+#    print args[0][46,:].flatten().tolist()
+#    print args[0][47,:].flatten().tolist()
+#    print args[1][46,:].shape
+#    print args[1][46,:].flatten().tolist()
+#    print args[1][47,:].flatten().tolist()
     pnet = Pnet(*args)
-    pnet.Gillespie(10000)
+    pnet.Gillespie(10**9)
 #     repeat = 10
 #     TimerInput = namedtuple('TimerInput', Timer.iheaders)
 #     smalltimerinput  = TimerInput(fpath=fpath, enlarge=100, step=10000, repeat=repeat)
